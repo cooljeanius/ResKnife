@@ -19,10 +19,10 @@
 
 - (IBAction)showCreateResourceSheet:(id)sender;
 - (IBAction)openResources:(id)sender;
-- (void)openResourceUsingEditor:(Resource *)resource;
 - (IBAction)openResourcesInTemplate:(id)sender;
-- (void)openResource:(Resource *)resource usingTemplate:(NSString *)templateName;
 - (IBAction)openResourcesAsHex:(id)sender;
+- (void)openResourceUsingEditor:(Resource *)resource;
+- (void)openResource:(Resource *)resource usingTemplate:(NSString *)templateName;
 - (void)openResourceAsHex:(Resource *)resource;
 - (IBAction)playSound:(id)sender;
 - (void)sound:(NSSound *)sound didFinishPlaying:(BOOL)finished;

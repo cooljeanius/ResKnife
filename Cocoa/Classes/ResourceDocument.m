@@ -288,17 +288,17 @@ static NSString *RKShowInfoItemIdentifier	= @"com.nickshanks.resknife.toolbar.sh
 	else [self openResourceAsHex:resource];
 }
 
-- (void)openResourceAsHex:(Resource *)aResource
+- (void)openResourceAsHex:(Resource *)resource
 {
 	NSBundle *hexEditor = [NSBundle bundleWithPath:[[[NSBundle mainBundle] builtInPlugInsPath] stringByAppendingPathComponent:@"Hexadecimal Editor.plugin"]];
-#warning I alloc a plug instance here, but have no idea where I should dealloc it, perhaps the plug ought to call [self autorelease] when it's last window is closed?
+	// bug: I alloc a plug instance here, but have no idea where I should dealloc it, perhaps the plug ought to call [self autorelease] when it's last window is closed?
 	
 	[(id <ResKnifePluginProtocol>)[[hexEditor principalClass] alloc] initWithResource:resource];
 }
 
 - (IBAction)playSound:(id)sender
 {
-#warning Can only cope with one selected item
+	// bug: Can only cope with one selected item
 	Resource *resource = [outlineView itemAtRow:[outlineView selectedRow]];
 	NSSound *sound = [[NSSound alloc] initWithData:[resource data]];
 	[sound setDelegate:self];
