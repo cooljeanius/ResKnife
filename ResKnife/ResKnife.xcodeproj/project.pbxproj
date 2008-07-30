@@ -267,7 +267,6 @@
 		E1B2A56A0E41103A00A72928 /* NuTemplateOCNTElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D50046F04EF040900F3B64D /* NuTemplateOCNTElement.h */; };
 		E1B2A56B0E41103A00A72928 /* NuTemplateLSTCElement.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D50047404EF122000F3B64D /* NuTemplateLSTCElement.h */; };
 		E1B2A56D0E41103A00A72928 /* NuTemplateWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = 3D0B38B504DEF465005AED5E /* NuTemplateWindow.nib */; };
-		E1B2A56E0E41103A00A72928 /* TODO.txt in Resources */ = {isa = PBXBuildFile; fileRef = 3D0933F404DFD7CF00DD74B1 /* TODO.txt */; };
 		E1B2A56F0E41103A00A72928 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3D2EE5E204E5C56F00515930 /* Localizable.strings */; };
 		E1B2A5710E41103A00A72928 /* NuTemplateWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D0B38B304DEF41E005AED5E /* NuTemplateWindowController.m */; };
 		E1B2A5720E41103A00A72928 /* Notifications.m in Sources */ = {isa = PBXBuildFile; fileRef = F5C9ECCE027F474A01A8010C /* Notifications.m */; };
@@ -284,10 +283,8 @@
 		E1B2A57D0E41103A00A72928 /* NuTemplateOCNTElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D50047004EF040900F3B64D /* NuTemplateOCNTElement.m */; };
 		E1B2A57E0E41103A00A72928 /* NuTemplateLSTCElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D50047304EF122000F3B64D /* NuTemplateLSTCElement.m */; };
 		E1B2A5800E41103A00A72928 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5B5884B0156D40B01000001 /* Cocoa.framework */; };
-		E1B2A5910E41103A00A72928 /* Bitmap Editor.plugin in CopyFiles */ = {isa = PBXBuildFile; fileRef = E1B2A55A0E41103A00A72928 /* Bitmap Editor.plugin */; };
-		E1B2A5920E41103A00A72928 /* New Template Editor.plugin in CopyFiles */ = {isa = PBXBuildFile; fileRef = E1B2A5860E41103A00A72928 /* New Template Editor.plugin */; };
+		E1B2A5920E41103A00A72928 /* Template Editor.plugin in CopyFiles */ = {isa = PBXBuildFile; fileRef = E1B2A5860E41103A00A72928 /* Template Editor.plugin */; };
 		E1B2A5930E41103A00A72928 /* Hexadecimal Editor.plugin in CopyFiles */ = {isa = PBXBuildFile; fileRef = E1B2A4570E41103800A72928 /* Hexadecimal Editor.plugin */; };
-		E1B2A5940E41103A00A72928 /* NovaTools.plugin in CopyFiles */ = {isa = PBXBuildFile; fileRef = E1B2A4940E41103800A72928 /* NovaTools.plugin */; };
 		E1B2A5950E41103A00A72928 /* libResKnife.dylib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E1B2A4F00E41103900A72928 /* libResKnife.dylib.a */; };
 /* End PBXBuildFile section */
 
@@ -315,35 +312,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = F5B5880F0156D2A601000001 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = E1B2A43E0E41103800A72928 /* Hex Editor Cocoa (Upgraded) */;
+			remoteGlobalIDString = E1B2A43E0E41103800A72928;
 			remoteInfo = "Hex Editor Cocoa (Upgraded)";
-		};
-		E1B2A5890E41103A00A72928 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = F5B5880F0156D2A601000001 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E1B2A4580E41103800A72928 /* Template Editor Cocoa (Upgraded) */;
-			remoteInfo = "Template Editor Cocoa (Upgraded)";
-		};
-		E1B2A58B0E41103A00A72928 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = F5B5880F0156D2A601000001 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E1B2A46A0E41103800A72928 /* NovaTools™ (Upgraded) */;
-			remoteInfo = "NovaTools™ (Upgraded)";
-		};
-		E1B2A58D0E41103A00A72928 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = F5B5880F0156D2A601000001 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E1B2A5490E41103A00A72928 /* Bitmap Editor Cocoa (Upgraded) */;
-			remoteInfo = "Bitmap Editor Cocoa (Upgraded)";
 		};
 		E1B2A58F0E41103A00A72928 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F5B5880F0156D2A601000001 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = E1B2A55B0E41103A00A72928 /* NuTemplateEditor Cocoa (Upgraded) */;
+			remoteGlobalIDString = E1B2A55B0E41103A00A72928;
 			remoteInfo = "NuTemplateEditor Cocoa (Upgraded)";
 		};
 /* End PBXContainerItemProxy section */
@@ -356,9 +332,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				E1B2A5930E41103A00A72928 /* Hexadecimal Editor.plugin in CopyFiles */,
-				E1B2A5940E41103A00A72928 /* NovaTools.plugin in CopyFiles */,
-				E1B2A5910E41103A00A72928 /* Bitmap Editor.plugin in CopyFiles */,
-				E1B2A5920E41103A00A72928 /* New Template Editor.plugin in CopyFiles */,
+				E1B2A5920E41103A00A72928 /* Template Editor.plugin in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -411,7 +385,7 @@
 		E1B2A4570E41103800A72928 /* Hexadecimal Editor.plugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hexadecimal Editor.plugin"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1B2A4680E41103800A72928 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E1B2A4690E41103800A72928 /* Template Editor.plugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Template Editor.plugin"; sourceTree = BUILT_PRODUCTS_DIR; };
-		E1B2A4930E41103800A72928 /* Info-NovaTools___Upgraded_.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-NovaTools___Upgraded_.plist"; sourceTree = "<group>"; };
+		E1B2A4930E41103800A72928 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E1B2A4940E41103800A72928 /* NovaTools.plugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NovaTools.plugin; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1B2A4C30E41103800A72928 /* Info-ResKnife_Carbon__Upgraded_.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-ResKnife_Carbon__Upgraded_.plist"; sourceTree = "<group>"; };
 		E1B2A4C40E41103900A72928 /* ResKnife Carbon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ResKnife Carbon.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -426,8 +400,8 @@
 		E1B2A5480E41103A00A72928 /* Ulis Template Editor.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Ulis Template Editor.bundle"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1B2A5590E41103A00A72928 /* Info-Bitmap_Editor_Cocoa__Upgraded_.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-Bitmap_Editor_Cocoa__Upgraded_.plist"; sourceTree = "<group>"; };
 		E1B2A55A0E41103A00A72928 /* Bitmap Editor.plugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Bitmap Editor.plugin"; sourceTree = BUILT_PRODUCTS_DIR; };
-		E1B2A5850E41103A00A72928 /* Info-NuTemplateEditor_Cocoa__Upgraded_.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-NuTemplateEditor_Cocoa__Upgraded_.plist"; sourceTree = "<group>"; };
-		E1B2A5860E41103A00A72928 /* New Template Editor.plugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "New Template Editor.plugin"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E1B2A5850E41103A00A72928 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E1B2A5860E41103A00A72928 /* Template Editor.plugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Template Editor.plugin"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5041736036BD60801A8010A /* ResKnife.scriptSuite */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ResKnife.scriptSuite; sourceTree = "<group>"; };
 		F50DFE17036C203F01A8010A /* English */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = English; path = Cocoa/English.lproj/ResKnife.scriptTerminology; sourceTree = SOURCE_ROOT; };
 		F50DFE22036C258201A8010A /* BoolTemplateField.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = BoolTemplateField.cpp; sourceTree = "<group>"; };
@@ -768,7 +742,7 @@
 			name = "Field Types";
 			sourceTree = "<group>";
 		};
-		3D0B38A504DEF41E005AED5E /* NuTemplateEditor */ = {
+		3D0B38A504DEF41E005AED5E /* Template Editor */ = {
 			isa = PBXGroup;
 			children = (
 				3D0ABFB904E152CA00C85300 /* TEMPLATE EDITOR.txt */,
@@ -781,9 +755,11 @@
 				3D0933BE04DF151C00DD74B1 /* NuTemplateStream.h */,
 				3D0933BF04DF151C00DD74B1 /* NuTemplateStream.m */,
 				3D0933EB04DF319F00DD74B1 /* Field Types */,
-				3D0B38B504DEF465005AED5E /* NuTemplateWindow.nib */,
+				E1B2A5850E41103A00A72928 /* Info.plist */,
 				3D2EE5E204E5C56F00515930 /* Localizable.strings */,
+				3D0B38B504DEF465005AED5E /* NuTemplateWindow.nib */,
 			);
+			name = "Template Editor";
 			path = NuTemplateEditor;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -830,18 +806,19 @@
 		F51FB38E0256057F01A80001 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				E1B2A4930E41103800A72928 /* Info.plist */,
+				F543AFEF027C716E01A8010C /* Resource Types.strings */,
 				F58F6BA9025BDBA701A8010C /* NovaTools.nib */,
 				F5EDC612025BFB7301A8010C /* boom.nib */,
 				F5EDC615025BFB7C01A8010C /* char.nib */,
 				F5EDC618025BFB8601A8010C /* colr.nib */,
 				F5EDC61B025BFB8E01A8010C /* cron.nib */,
 				F5EDC61E025BFBB501A8010C /* desc.nib */,
-				F543AFEF027C716E01A8010C /* Resource Types.strings */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
 		};
-		F5354435022673C101A80001 /* Template Editor */ = {
+		F5354435022673C101A80001 /* Template Editor (Abandoned) */ = {
 			isa = PBXGroup;
 			children = (
 				F535443E0226752901A80001 /* TemplateWindowController.h */,
@@ -851,6 +828,7 @@
 				E1B2A4680E41103800A72928 /* Info.plist */,
 				F5D0CBD302278F8B01A80001 /* TemplateWindow.nib */,
 			);
+			name = "Template Editor (Abandoned)";
 			path = "Template Editor";
 			sourceTree = "<group>";
 		};
@@ -874,9 +852,9 @@
 				F5502C4001C579FF01C57124 /* ResKnifePluginProtocol.h */,
 				F5CDEBAB01FC893201A80001 /* ResKnifeResourceProtocol.h */,
 				F5EF839F020C08E601A80001 /* Hex Editor */,
-				F5354435022673C101A80001 /* Template Editor */,
 				3D3B99B704DC167D0056861E /* Bitmap Editor */,
-				3D0B38A504DEF41E005AED5E /* NuTemplateEditor */,
+				3D0B38A504DEF41E005AED5E /* Template Editor */,
+				F5354435022673C101A80001 /* Template Editor (Abandoned) */,
 			);
 			path = "Plug-Ins";
 			sourceTree = "<group>";
@@ -903,14 +881,12 @@
 				F5DF1C0F0254C78801A80001 /* NovaTools */,
 				F5B588490156D40B01000001 /* Frameworks */,
 				F5B588110156D30301000001 /* Products */,
-				E1B2A4930E41103800A72928 /* Info-NovaTools___Upgraded_.plist */,
 				E1B2A4C30E41103800A72928 /* Info-ResKnife_Carbon__Upgraded_.plist */,
 				E1B2A5060E41103900A72928 /* Info-Hex_Editor_Carbon__Upgraded_.plist */,
 				E1B2A5170E41103900A72928 /* Info-Template_Editor_Carbon__Upgraded_.plist */,
 				E1B2A5280E41103900A72928 /* Info-PICT_Editor__Upgraded_.plist */,
 				E1B2A5470E41103900A72928 /* Info-Uli_s_Template_Editor__Upgraded_.plist */,
 				E1B2A5590E41103A00A72928 /* Info-Bitmap_Editor_Cocoa__Upgraded_.plist */,
-				E1B2A5850E41103A00A72928 /* Info-NuTemplateEditor_Cocoa__Upgraded_.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -928,7 +904,7 @@
 				E1B2A5290E41103900A72928 /* PICT Editor.bundle */,
 				E1B2A5480E41103A00A72928 /* Ulis Template Editor.bundle */,
 				E1B2A55A0E41103A00A72928 /* Bitmap Editor.plugin */,
-				E1B2A5860E41103A00A72928 /* New Template Editor.plugin */,
+				E1B2A5860E41103A00A72928 /* Template Editor.plugin */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1480,10 +1456,7 @@
 			);
 			dependencies = (
 				E1B2A5880E41103A00A72928 /* PBXTargetDependency */,
-				E1B2A58A0E41103A00A72928 /* PBXTargetDependency */,
 				E1B2A5900E41103A00A72928 /* PBXTargetDependency */,
-				E1B2A58E0E41103A00A72928 /* PBXTargetDependency */,
-				E1B2A58C0E41103A00A72928 /* PBXTargetDependency */,
 			);
 			name = "ResKnife Cocoa";
 			productInstallPath = "$(USER_APPS_DIR)";
@@ -1510,9 +1483,9 @@
 			productReference = E1B2A4570E41103800A72928 /* Hexadecimal Editor.plugin */;
 			productType = "com.apple.product-type.bundle";
 		};
-		E1B2A4580E41103800A72928 /* Template Editor Cocoa */ = {
+		E1B2A4580E41103800A72928 /* Nick's Template Editor (Abandoned) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E1B2A4650E41103800A72928 /* Build configuration list for PBXNativeTarget "Template Editor Cocoa" */;
+			buildConfigurationList = E1B2A4650E41103800A72928 /* Build configuration list for PBXNativeTarget "Nick's Template Editor (Abandoned)" */;
 			buildPhases = (
 				E1B2A4590E41103800A72928 /* Headers */,
 				E1B2A45C0E41103800A72928 /* Resources */,
@@ -1524,7 +1497,7 @@
 			);
 			dependencies = (
 			);
-			name = "Template Editor Cocoa";
+			name = "Nick's Template Editor (Abandoned)";
 			productInstallPath = "$(USER_LIBRARY_DIR)/Bundles";
 			productName = "Template Editor Cocoa";
 			productReference = E1B2A4690E41103800A72928 /* Template Editor.plugin */;
@@ -1648,9 +1621,9 @@
 			productReference = E1B2A5290E41103900A72928 /* PICT Editor.bundle */;
 			productType = "com.apple.product-type.bundle";
 		};
-		E1B2A52A0E41103900A72928 /* Uli's Template Editor */ = {
+		E1B2A52A0E41103900A72928 /* Uli's Template Editor (Abandoned) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E1B2A5440E41103900A72928 /* Build configuration list for PBXNativeTarget "Uli's Template Editor" */;
+			buildConfigurationList = E1B2A5440E41103900A72928 /* Build configuration list for PBXNativeTarget "Uli's Template Editor (Abandoned)" */;
 			buildPhases = (
 				E1B2A52B0E41103900A72928 /* Headers */,
 				E1B2A5350E41103900A72928 /* Resources */,
@@ -1662,7 +1635,7 @@
 			);
 			dependencies = (
 			);
-			name = "Uli's Template Editor";
+			name = "Uli's Template Editor (Abandoned)";
 			productInstallPath = "$(USER_LIBRARY_DIR)/Bundles";
 			productName = "Uli's Template Editor";
 			productReference = E1B2A5480E41103A00A72928 /* Ulis Template Editor.bundle */;
@@ -1688,9 +1661,9 @@
 			productReference = E1B2A55A0E41103A00A72928 /* Bitmap Editor.plugin */;
 			productType = "com.apple.product-type.bundle";
 		};
-		E1B2A55B0E41103A00A72928 /* NuTemplateEditor Cocoa */ = {
+		E1B2A55B0E41103A00A72928 /* Template Editor Cocoa */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E1B2A5820E41103A00A72928 /* Build configuration list for PBXNativeTarget "NuTemplateEditor Cocoa" */;
+			buildConfigurationList = E1B2A5820E41103A00A72928 /* Build configuration list for PBXNativeTarget "Template Editor Cocoa" */;
 			buildPhases = (
 				E1B2A55C0E41103A00A72928 /* Headers */,
 				E1B2A56C0E41103A00A72928 /* Resources */,
@@ -1704,10 +1677,10 @@
 			);
 			dependencies = (
 			);
-			name = "NuTemplateEditor Cocoa";
+			name = "Template Editor Cocoa";
 			productInstallPath = "$(USER_LIBRARY_DIR)/Bundles";
 			productName = "NuTemplateEditor Cocoa";
-			productReference = E1B2A5860E41103A00A72928 /* New Template Editor.plugin */;
+			productReference = E1B2A5860E41103A00A72928 /* Template Editor.plugin */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
@@ -1725,8 +1698,7 @@
 			targets = (
 				E1B2A3DE0E41103700A72928 /* ResKnife Cocoa */,
 				E1B2A43E0E41103800A72928 /* Hex Editor Cocoa */,
-				E1B2A4580E41103800A72928 /* Template Editor Cocoa */,
-				E1B2A55B0E41103A00A72928 /* NuTemplateEditor Cocoa */,
+				E1B2A55B0E41103A00A72928 /* Template Editor Cocoa */,
 				E1B2A5490E41103A00A72928 /* Bitmap Editor Cocoa */,
 				E1B2A46A0E41103800A72928 /* NovaTools */,
 				E1B2A4950E41103800A72928 /* ResKnife Carbon */,
@@ -1734,7 +1706,8 @@
 				E1B2A4F10E41103900A72928 /* Hex Editor Carbon */,
 				E1B2A5080E41103900A72928 /* Template Editor Carbon */,
 				E1B2A5190E41103900A72928 /* PICT Editor */,
-				E1B2A52A0E41103900A72928 /* Uli's Template Editor */,
+				E1B2A52A0E41103900A72928 /* Uli's Template Editor (Abandoned) */,
+				E1B2A4580E41103800A72928 /* Nick's Template Editor (Abandoned) */,
 			);
 		};
 /* End PBXProject section */
@@ -1850,7 +1823,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E1B2A56D0E41103A00A72928 /* NuTemplateWindow.nib in Resources */,
-				E1B2A56E0E41103A00A72928 /* TODO.txt in Resources */,
 				E1B2A56F0E41103A00A72928 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2144,24 +2116,9 @@
 			target = E1B2A43E0E41103800A72928 /* Hex Editor Cocoa */;
 			targetProxy = E1B2A5870E41103A00A72928 /* PBXContainerItemProxy */;
 		};
-		E1B2A58A0E41103A00A72928 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E1B2A4580E41103800A72928 /* Template Editor Cocoa */;
-			targetProxy = E1B2A5890E41103A00A72928 /* PBXContainerItemProxy */;
-		};
-		E1B2A58C0E41103A00A72928 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E1B2A46A0E41103800A72928 /* NovaTools */;
-			targetProxy = E1B2A58B0E41103A00A72928 /* PBXContainerItemProxy */;
-		};
-		E1B2A58E0E41103A00A72928 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E1B2A5490E41103A00A72928 /* Bitmap Editor Cocoa */;
-			targetProxy = E1B2A58D0E41103A00A72928 /* PBXContainerItemProxy */;
-		};
 		E1B2A5900E41103A00A72928 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = E1B2A55B0E41103A00A72928 /* NuTemplateEditor Cocoa */;
+			target = E1B2A55B0E41103A00A72928 /* Template Editor Cocoa */;
 			targetProxy = E1B2A58F0E41103A00A72928 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -2555,7 +2512,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREFIX_HEADER = "Prefix Files/C99 Prefix.h";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				INFOPLIST_FILE = "Info-NovaTools___Upgraded_.plist";
+				INFOPLIST_FILE = NovaTools/Info.plist;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
@@ -2580,7 +2537,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PREFIX_HEADER = "Prefix Files/C99 Prefix.h";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				INFOPLIST_FILE = "Info-NovaTools___Upgraded_.plist";
+				INFOPLIST_FILE = NovaTools/Info.plist;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
@@ -2983,11 +2940,11 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				INFOPLIST_FILE = "Info-NuTemplateEditor_Cocoa__Upgraded_.plist";
+				INFOPLIST_FILE = NuTemplateEditor/Info.plist;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = "New Template Editor";
+				PRODUCT_NAME = "Template Editor";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3006,11 +2963,11 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				INFOPLIST_FILE = "Info-NuTemplateEditor_Cocoa__Upgraded_.plist";
+				INFOPLIST_FILE = NuTemplateEditor/Info.plist;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = "New Template Editor";
+				PRODUCT_NAME = "Template Editor";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3052,7 +3009,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		E1B2A4650E41103800A72928 /* Build configuration list for PBXNativeTarget "Template Editor Cocoa" */ = {
+		E1B2A4650E41103800A72928 /* Build configuration list for PBXNativeTarget "Nick's Template Editor (Abandoned)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E1B2A4660E41103800A72928 /* Debug */,
@@ -3115,7 +3072,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		E1B2A5440E41103900A72928 /* Build configuration list for PBXNativeTarget "Uli's Template Editor" */ = {
+		E1B2A5440E41103900A72928 /* Build configuration list for PBXNativeTarget "Uli's Template Editor (Abandoned)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E1B2A5450E41103900A72928 /* Debug */,
@@ -3133,7 +3090,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		E1B2A5820E41103A00A72928 /* Build configuration list for PBXNativeTarget "NuTemplateEditor Cocoa" */ = {
+		E1B2A5820E41103A00A72928 /* Build configuration list for PBXNativeTarget "Template Editor Cocoa" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E1B2A5830E41103A00A72928 /* Debug */,
