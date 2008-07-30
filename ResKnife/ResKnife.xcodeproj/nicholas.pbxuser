@@ -492,6 +492,41 @@
 		path = /Users/nicholas/Projects/ResKnife/Cocoa/Info.plist;
 		sourceTree = "<absolute>";
 	};
+	E1B2A6360E41198D00A72928 /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = E1B2A6370E41198D00A72928 /* Info.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+		);
+		name = /Users/nicholas/Projects/ResKnife/Cocoa/Info.plist;
+		rLen = 0;
+		rLoc = 2147483647;
+	};
+	E1B2A6370E41198D00A72928 /* Info.plist */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = text.plist.xml;
+		name = Info.plist;
+		path = /Users/nicholas/Projects/ResKnife/Cocoa/Info.plist;
+		sourceTree = "<absolute>";
+	};
+	E1B2A6380E41198D00A72928 /* PlistBookmark */ = {
+		isa = PlistBookmark;
+		fRef = E1B2A6390E41198D00A72928 /* Info.plist */;
+		fallbackIsa = PBXBookmark;
+		isK = 0;
+		kPath = (
+		);
+		name = /Users/nicholas/Projects/ResKnife/Cocoa/Info.plist;
+		rLen = 0;
+		rLoc = 2147483647;
+	};
+	E1B2A6390E41198D00A72928 /* Info.plist */ = {
+		isa = PBXFileReference;
+		name = Info.plist;
+		path = /Users/nicholas/Projects/ResKnife/Cocoa/Info.plist;
+		sourceTree = "<absolute>";
+	};
 	F591B14C030E75FA01A8010C /* -[NSMenuItem setTitle:] */ = {
 		isa = PBXSymbolicBreakpoint;
 		breakpointStyle = 0;
@@ -1598,6 +1633,8 @@
 			E1B2A62E0E41185100A72928 /* PlistBookmark */ = E1B2A62E0E41185100A72928 /* PlistBookmark */;
 			E1B2A62F0E41185100A72928 /* PlistBookmark */ = E1B2A62F0E41185100A72928 /* PlistBookmark */;
 			E1B2A6320E4118FB00A72928 /* PlistBookmark */ = E1B2A6320E4118FB00A72928 /* PlistBookmark */;
+			E1B2A6360E41198D00A72928 /* PlistBookmark */ = E1B2A6360E41198D00A72928 /* PlistBookmark */;
+			E1B2A6380E41198D00A72928 /* PlistBookmark */ = E1B2A6380E41198D00A72928 /* PlistBookmark */;
 		};
 		sourceControlManager = E1B2A3850E410C3500A72928 /* Source Control */;
 		userBookmarkGroup = F5C9ECCB027F25E101A8010C /* PBXBookmarkGroup */;
