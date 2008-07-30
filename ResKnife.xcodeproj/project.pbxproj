@@ -405,9 +405,9 @@
 		3D50047404EF122000F3B64D /* NuTemplateLSTCElement.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = NuTemplateLSTCElement.h; sourceTree = "<group>"; };
 		3D53A9FD04F171DC006651FA /* RKSupportResourceRegistry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKSupportResourceRegistry.h; sourceTree = "<group>"; };
 		3D53A9FE04F171DC006651FA /* RKSupportResourceRegistry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKSupportResourceRegistry.m; sourceTree = "<group>"; };
-		E1B2A43B0E41103700A72928 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = ../Info.plist; sourceTree = "<group>"; };
+		E1B2A43B0E41103700A72928 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = "../Plug-Ins/Hex Editor/Info.plist"; sourceTree = "<group>"; };
 		E1B2A43C0E41103800A72928 /* ResKnife Cocoa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ResKnife Cocoa.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		E1B2A4560E41103800A72928 /* Info-Hex_Editor_Cocoa__Upgraded_.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-Hex_Editor_Cocoa__Upgraded_.plist"; sourceTree = "<group>"; };
+		E1B2A4560E41103800A72928 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E1B2A4570E41103800A72928 /* Hexadecimal Editor.plugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hexadecimal Editor.plugin"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1B2A4680E41103800A72928 /* Info-Template_Editor_Cocoa__Upgraded_.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-Template_Editor_Cocoa__Upgraded_.plist"; sourceTree = "<group>"; };
 		E1B2A4690E41103800A72928 /* Template Editor.plugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Template Editor.plugin"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -902,7 +902,6 @@
 				F5DF1C0F0254C78801A80001 /* NovaTools */,
 				F5B588490156D40B01000001 /* Frameworks */,
 				F5B588110156D30301000001 /* Products */,
-				E1B2A4560E41103800A72928 /* Info-Hex_Editor_Cocoa__Upgraded_.plist */,
 				E1B2A4680E41103800A72928 /* Info-Template_Editor_Cocoa__Upgraded_.plist */,
 				E1B2A4930E41103800A72928 /* Info-NovaTools___Upgraded_.plist */,
 				E1B2A4C30E41103800A72928 /* Info-ResKnife_Carbon__Upgraded_.plist */,
@@ -1249,6 +1248,7 @@
 				F5EF83A3020C08E601A80001 /* HexTextView.m */,
 				F5EF83A7020C08E601A80001 /* HexWindowController.h */,
 				F5EF83A8020C08E601A80001 /* HexWindowController.m */,
+				E1B2A4560E41103800A72928 /* Info.plist */,
 				F5EF83C7020C20D701A80001 /* HexWindow.nib */,
 				F5606FDD02ACF2F701A8010C /* PasteMenu.nib */,
 				F54E6222021B6A0801A80001 /* FindSheet.nib */,
@@ -2443,7 +2443,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREFIX_HEADER = "Prefix Files/C99 Prefix.h";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				INFOPLIST_FILE = "Info-Hex_Editor_Cocoa__Upgraded_.plist";
+				INFOPLIST_FILE = "Cocoa/Plug-Ins/Hex Editor/Info.plist";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-bundle",
@@ -2472,7 +2472,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PREFIX_HEADER = "Prefix Files/C99 Prefix.h";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				INFOPLIST_FILE = "Info-Hex_Editor_Cocoa__Upgraded_.plist";
+				INFOPLIST_FILE = "Cocoa/Plug-Ins/Hex Editor/Info.plist";
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-bundle",
