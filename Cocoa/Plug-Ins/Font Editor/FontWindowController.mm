@@ -277,7 +277,8 @@ UInt32 TableChecksum(UInt32 *table, UInt32 length)
 
 @end
 
-/*	sfnt_header *header = (sfnt_header *) [[resource data] bytes];
+#if 0
+	sfnt_header *header = (sfnt_header *) [[resource data] bytes];
 	for(int i = 0; i < header->tableCount; i++)
 	{
 		switch(header->tableInfo[i].tagname)
@@ -335,4 +336,4 @@ UInt32 TableChecksum(UInt32 *table, UInt32 length)
 				break;
 		}
 	}
-*/
+#endif /* 0 */

@@ -3,7 +3,7 @@
 #import "FindSheetController.h"
 #import "NSData-HexRepresentation.h"
 
-/*
+#if 0
 OSStatus Plug_InitInstance(Plug_PlugInRef plug, Plug_ResourceRef resource)
 {
 	// init function called by carbon apps
@@ -17,7 +17,7 @@ OSStatus Plug_InitInstance(Plug_PlugInRef plug, Plug_ResourceRef resource)
 	}
 	else return paramErr;
 }
-*/
+#endif /* 0 */
 
 @implementation HexWindowController
 
