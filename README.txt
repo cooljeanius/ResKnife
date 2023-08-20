@@ -46,7 +46,6 @@ HISTORY
 
 ResKnife has had a protracted and erratic history. It started in 1997 when Nicholas Shanks decided ResEdit needed a successor and because he wanted to play around with the new resources available with Mac OS 8.0, yet didn't have the money to buy Resourcerer. After three months of fast R&D, version 0.1d9 was quite stable and had many features, including a working hex editor. Then in a careless act of stupidity, Nicholas decided to Carbonise the program without backing up the 0.1d9 source. It failed, and much that once was had been lost. Throwing away that mess and starting again, Nicholas tried to re-write ResKnife as a Carbon app from the ground up. Thrice. Versions 0.2 and 0.3 were aborted attempts to do this, version 0.4 was more successful, and now forms the basis for the Carbon variant of ResKnife. Soon after, the wonders of Cocoa were discovered and required learning, and Nicholas turned to his pet project ResKnife to help him learn. The Cocoa re-write became version 0.5 and in conjunction with version 0.4 which had had a few touch-ups added to it since, was committed to CVS almost two years after the last commit had occurred. Two more years passed with not much change to ResKnife, before Uli Kusterer, collaborator for earlier versions of ResKnife and himself writing a resource editor with special consideration for users of the MacZoop framework, decided to write a template editor for the project. Throughout the development of the project contributions small and large have trickled in, and all who contributed are recognized below.
 
-
 AUTHORS
 -------
 
@@ -84,6 +83,6 @@ ResKnife methods, functions, headers, classes, ivars and practically anything el
 	4) The value for the @created keyword should take the following form:	YYYY-MM-DD
 	5) The value for the @updated keyword should take the following form:	YYYY-MM-DD Author: Description
 		where Author is your initials or sourceforge user name.
-	
+
 	Due to really poor maintenance on my part, very few methods have @updated comments. Sorry :-(
 */
