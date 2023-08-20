@@ -2,6 +2,21 @@
 #import "HexWindowController.h"
 
 @implementation FindSheetController
+@synthesize findString;
+@synthesize replaceString;
+
+@synthesize cancelButton;
+@synthesize findNextButton;
+@synthesize findReplaceForm;
+@synthesize replaceAllButton;
+
+@synthesize startAtTopBox;
+@synthesize wrapAroundBox;
+@synthesize searchBackwardsBox;
+@synthesize searchSelectionOnlyBox;
+@synthesize caseSensitiveBox;
+@synthesize matchEntireWordsBox;
+@synthesize searchASCIIOrHexRadios;
 
 /* FORM DELEGATION METHOD */
 
@@ -12,11 +27,8 @@
 
 - (void)updateStrings
 {
-	[findString autorelease];
-	[replaceString autorelease];
-	
-	findString = [[[findReplaceForm cellAtIndex:0] stringValue] copy];
-	replaceString = [[[findReplaceForm cellAtIndex:1] stringValue] copy];
+	self.findString = [[findReplaceForm cellAtIndex:0] stringValue];
+	self.replaceString = [[findReplaceForm cellAtIndex:1] stringValue];
 }
 
 /* HIDE AND SHOW SHEET */
@@ -27,7 +39,7 @@
 	[self window];
 	
 	// enable/disable boxes
-	[searchSelectionOnlyBox setEnabled:([(NSTextView *)[[sender window] firstResponder] rangeForUserTextChange].length != 0)];
+	[searchSelectionOnlyBox setEnabled:([[[[(HexWindowController *)sender textView] controller] selectedContentsRanges][0] HFRange].length != 0)];
 	
 	// set inital values
 	if( ![searchSelectionOnlyBox isEnabled] )	[searchSelectionOnlyBox setIntValue:0];
@@ -58,8 +70,7 @@
 
 - (IBAction)findWithSelection:(id)sender
 {
-	[findString autorelease];
-	findString = [[NSString string] retain];
+	findString = [NSString string];
 	NSLog( @"Finding \"%@\"", findString );
 }
 

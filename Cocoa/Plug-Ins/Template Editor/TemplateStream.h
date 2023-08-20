@@ -9,15 +9,15 @@
 	NSMutableArray *keyStack;
 }
 
-+ (id)streamWithBytes:(char *)d length:(unsigned int)l;
-+ (id)substreamWithStream:(TemplateStream *)s length:(unsigned int)l;
+@property unsigned int bytesToGo;
 
-- (id)initStreamWithBytes:(char *)d length:(unsigned int)l;
-- (id)initWithStream:(TemplateStream *)s length:(unsigned int)l;
++ (instancetype)streamWithBytes:(char *)d length:(unsigned int)l;
++ (instancetype)substreamWithStream:(TemplateStream *)s length:(unsigned int)l;
+
+- (instancetype)initStreamWithBytes:(char *)d length:(unsigned int)l;
+- (instancetype)initWithStream:(TemplateStream *)s length:(unsigned int)l;
 
 - (char *)data;
-- (unsigned int)bytesToGo;
-- (void)setBytesToGo:(unsigned int)b;
 - (ElementOCNT *)counter;
 - (void)pushCounter:(ElementOCNT *)c;
 - (void)popCounter;

@@ -1,7 +1,7 @@
 #import "ResourceDataSource.h"
 #import "ResourceDocument.h"
 #import "Resource.h"
-#import <limits.h>
+@import Darwin.C.limits;
 
 NSString *DataSourceWillAddResourceNotification = @"DataSourceWillAddResource";
 NSString *DataSourceDidAddResourceNotification = @"DataSourceDidAddResource";
@@ -11,8 +11,12 @@ NSString *DataSourceDidRemoveResourceNotification = @"DataSourceDidRemoveResourc
 extern NSString *RKResourcePboardType;
 
 @implementation ResourceDataSource
+@synthesize document;
+@synthesize outlineView;
+@synthesize window;
+@synthesize resources;
 
-- (id)init
+- (instancetype)init
 {
 	self = [super init];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(resourceDidChange:) name:ResourceDidChangeNotification object:nil];
@@ -22,12 +26,6 @@ extern NSString *RKResourcePboardType;
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[super dealloc];
-}
-
-- (NSWindow *)window
-{
-	return window;
 }
 
 - (NSArray *)resources
@@ -37,15 +35,14 @@ extern NSString *RKResourcePboardType;
 
 - (void)setResources:(NSMutableArray *)newResources
 {
-	id old = resources;
-	resources = [newResources retain];
-	[old release];
+	resources = newResources;
+	[resources sortUsingDescriptors:[outlineView sortDescriptors]];
 	[outlineView reloadData];
 }
 
 - (void)addResource:(Resource *)resource
 {
-	NSDictionary *dictionary = [NSDictionary dictionaryWithObjectsAndKeys:self, @"DataSource", resource, @"Resource", nil];
+	NSDictionary *dictionary = @{@"DataSource": self, @"Resource": resource};
 	[[NSNotificationCenter defaultCenter] postNotificationName:DataSourceWillAddResourceNotification object:dictionary];
 	
 	// it seems very inefficient to reload the entire data source when just adding/removing one item
@@ -59,7 +56,7 @@ extern NSString *RKResourcePboardType;
 
 - (void)removeResource:(Resource *)resource
 {
-	NSDictionary *dictionary = [NSDictionary dictionaryWithObjectsAndKeys:self, @"DataSource", resource, @"Resource", nil];
+	NSDictionary *dictionary = @{@"DataSource": self, @"Resource": resource};
 	[[NSNotificationCenter defaultCenter] postNotificationName:DataSourceWillRemoveResourceNotification object:dictionary];
 	
 	// see comments in addResource: about inefficiency of reloadData
@@ -78,10 +75,10 @@ extern NSString *RKResourcePboardType;
 
 /* Data source protocol implementation */
 
-- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
 	#pragma unused(outlineView, item)
-	return [resources objectAtIndex:index];
+	return resources[index];
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
@@ -90,7 +87,7 @@ extern NSString *RKResourcePboardType;
 	return NO;
 }
 
-- (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
+- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
 	#pragma unused(outlineView, item)
 	return [resources count];
@@ -107,45 +104,36 @@ extern NSString *RKResourcePboardType;
 	#pragma unused(outlineView)
 	NSString *identifier = [tableColumn identifier];
 	if([identifier isEqualToString:@"resID"])
-		[item setValue:[NSNumber numberWithInt:[object intValue]] forKey:identifier];
+		[item setValue:@([object intValue]) forKey:identifier];
 	else [item setValue:object forKey:identifier];
 }
 
 #pragma mark -
 /* ACCESSORS */
 
-- (Resource *)resourceOfType:(NSString *)type andID:(NSNumber *)resID
+- (Resource *)resourceOfType:(OSType)type andID:(short)resID
 {
-	Resource *resource;
-	NSEnumerator *enumerator = [resources objectEnumerator];
-	while(resource = [enumerator nextObject])
-	{
-		if(resID && [[resource resID] isEqualToNumber:resID] && type && [[resource type] isEqualToString:type])
+	for (Resource *resource in resources) {
+		if(resID && resource.resID == resID && type && resource.type == type)
 			return resource;
 	}
 	return nil;
 }
 
-- (Resource *)resourceOfType:(NSString *)type withName:(NSString *)name
+- (Resource *)resourceOfType:(OSType)type withName:(NSString *)name
 {
-	Resource *resource;
-	NSEnumerator *enumerator = [resources objectEnumerator];
-	while(resource = [enumerator nextObject])
-	{
-		if([[resource name] isEqualToString:name] && [[resource type] isEqualToString:type])
+	for (Resource *resource in resources) {
+		if([resource.name isEqualToString:name] && resource.type == type)
 			return resource;
 	}
 	return nil;
 }
 
-- (NSArray *)allResourcesOfType:(NSString *)type
+- (NSArray *)allResourcesOfType:(OSType)type
 {
-	Resource		*resource;
 	NSMutableArray  *array = [NSMutableArray array];
-	NSEnumerator	*enumerator = [resources objectEnumerator];
-	while(resource = [enumerator nextObject])
-	{
-		if([[resource type] isEqualToString:type])
+	for (Resource *resource in resources) {
+		if([resource type] == type)
 			[array addObject:resource];
 	}
 	return [NSArray arrayWithArray:array];
@@ -157,18 +145,15 @@ extern NSString *RKResourcePboardType;
 @updated	2003-08-01  UK  Created based on allResourcesOfType:
 */
 
-- (NSArray*)allResourceIDsOfType:(NSString *)type
+- (NSArray*)allResourceIDsOfType:(OSType)type
 {
-	if(!type || [type isEqualToString:@""])
-		return [NSArray array];
+	if(!type)
+		return @[];
 	
-	Resource		*resource;
 	NSMutableArray  *array = [NSMutableArray array];
-	NSEnumerator	*enumerator = [resources objectEnumerator];
-	while(resource = [enumerator nextObject])
-	{
-		if([[resource type] isEqualToString:type])
-			[array addObject:[resource resID]];
+	for (Resource *resource in resources) {
+		if([resource type] == type)
+			[array addObject:@(resource.resID)];
 	}
 	return [NSArray arrayWithArray:array];
 }
@@ -180,18 +165,18 @@ extern NSString *RKResourcePboardType;
 @updated	2003-10-21  NGS:  Changed to obtain initial ID from -[resource defaultIDForType:], so we can vary it on a pre-resource-type basis (like Resourcerer can)
 */
 
-- (NSNumber *)uniqueIDForType:(NSString *)type
+- (short)uniqueIDForType:(OSType)type
 {
-	short   theID = [[self defaultIDForType:type] shortValue];
+	short   theID = [self defaultIDForType:type];
 	NSArray *array = [self allResourceIDsOfType:type];
 	
 	if([array count] <= USHRT_MAX)
 	{
-		while([array containsObject:[NSNumber numberWithShort:theID]])
+		while([array containsObject:@(theID)])
 			theID++;
 	}
 	
-	return [NSNumber numberWithShort: theID];
+	return theID;
 }
 
 /*!
@@ -199,10 +184,10 @@ extern NSString *RKResourcePboardType;
 @pending	Method should look for resources specifying what the initial ID is for this resource type (e.g. 'vers' resources start at 0)
 */
 
-- (NSNumber *)defaultIDForType:(NSString *)type
+- (short)defaultIDForType:(OSType)type
 {
 	short defaultID = 128;
-	return [NSNumber numberWithShort:defaultID];
+	return defaultID;
 }
 
 #pragma mark -
@@ -213,7 +198,7 @@ extern NSString *RKResourcePboardType;
 */
 - (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pb
 {
-	[pb declareTypes:[NSArray arrayWithObject:RKResourcePboardType] owner:self];
+	[pb declareTypes:@[RKResourcePboardType] owner:self];
 	[pb setData:[NSArchiver archivedDataWithRootObject:items] forType:RKResourcePboardType];
 	return YES;
 }
@@ -222,11 +207,11 @@ extern NSString *RKResourcePboardType;
 @method		outlineView:validateDrop:proposedItem:proposedChildIndex:
 @abstract   Called when the user is hovering with a drop over our outline view.
 */
-- (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(int)childIndex
+- (NSDragOperation)outlineView:(NSOutlineView *)oView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)childIndex
 {
-	if([info draggingSource] != outlineView)
+	if([info draggingSource] != oView)
 	{
-		[outlineView setDropItem:nil dropChildIndex:NSOutlineViewDropOnItemIndex];
+		[oView setDropItem:nil dropChildIndex:NSOutlineViewDropOnItemIndex];
 		return NSDragOperationCopy;
 	}
 	else return NSDragOperationNone;
@@ -236,12 +221,18 @@ extern NSString *RKResourcePboardType;
 @method		outlineView:acceptDrop:item:childIndex:
 @abstract   Called when the user drops something on our outline view.
 */
-- (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)targetItem childIndex:(int)childIndex
+- (BOOL)outlineView:(NSOutlineView *)oView acceptDrop:(id <NSDraggingInfo>)info item:(id)targetItem childIndex:(NSInteger)childIndex
 {
 	NSPasteboard *pb = [info draggingPasteboard];
-	if([pb availableTypeFromArray:[NSArray arrayWithObject:RKResourcePboardType]])
+	if([pb availableTypeFromArray:@[RKResourcePboardType]])
 		[document pasteResources:[NSUnarchiver unarchiveObjectWithData:[pb dataForType:RKResourcePboardType]]];
 	return YES;
 }
+
+- (void)outlineView:(NSOutlineView *)oView sortDescriptorsDidChange:(NSArray *)oldDescriptors {	
+	[resources sortUsingDescriptors:[oView sortDescriptors]];
+	[oView reloadData];
+}
+
 
 @end

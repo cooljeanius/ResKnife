@@ -9,15 +9,50 @@
 #import "ElementDLNG.h"
 
 #import "NSOutlineView-SelectedItems.h"
+#import "CreateResourceSheetController.h"
 
 @implementation TemplateWindowController
 
-- (id)initWithResource:(id <ResKnifeResourceProtocol>)newResource
+- (instancetype)initWithResource:(id <ResKnifeResource>)newResource
 {
-	return [self initWithResources:newResource, nil];
+	return [self initWithResource:newResource template:nil];
 }
 
-- (id)initWithResources:(id <ResKnifeResourceProtocol>)newResource, ...
+- (instancetype)initWithResource:(id <ResKnifeResource>)newResource template:(id <ResKnifeResource>)tmplResource
+{
+	self = [self initWithWindowNibName:@"TemplateWindow"];
+	if(!self)
+	{
+		return nil;
+	}
+	
+	toolbarItems = [[NSMutableDictionary alloc] init];
+	//undoManager = [[NSUndoManager alloc] init];
+	liveEdit = NO;
+	if(liveEdit)
+	{
+		resource = newResource;	// resource to work on
+		backup = [resource copy];	// for reverting only
+	}
+	else
+	{
+		backup = newResource;		// actual resource to change when saving data
+		resource = [backup copy];	// resource to work on
+	}
+	templateStructure = [[NSMutableArray alloc] init];
+	resourceStructure = [[NSMutableArray alloc] init];
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(templateDataDidChange:) name:ResourceDataDidChangeNotification object:tmplResource];
+	[self readTemplate:tmplResource];	// reads (but doesn't retain) the template for this resource (TMPL resource with name equal to the passed resource's type)
+	
+	// load the window from the nib
+	[self setShouldCascadeWindows:YES];
+	[self window];
+	return self;
+
+}
+
+- (instancetype)initWithResources:(id <ResKnifeResource>)newResource, ...
 {
 	id tmplResource;
 	va_list resourceList;
@@ -31,17 +66,17 @@
 	}
 	
 	toolbarItems = [[NSMutableDictionary alloc] init];
-//	undoManager = [[NSUndoManager alloc] init];
+	//undoManager = [[NSUndoManager alloc] init];
 	liveEdit = NO;
 	if(liveEdit)
 	{
-		resource = [(id)newResource retain];	// resource to work on
-		backup = [(NSObject *)resource copy];	// for reverting only
+		resource = newResource;	// resource to work on
+		backup = [resource copy];	// for reverting only
 	}
 	else
 	{
-		backup = [(id)newResource retain];		// actual resource to change when saving data
-		resource = [(NSObject *)backup copy];	// resource to work on
+		backup = newResource;		// actual resource to change when saving data
+		resource = [backup copy];	// resource to work on
 	}
 	templateStructure = [[NSMutableArray alloc] init];
 	resourceStructure = [[NSMutableArray alloc] init];
@@ -50,7 +85,7 @@
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(templateDataDidChange:) name:ResourceDataDidChangeNotification object:tmplResource];
 	[self readTemplate:tmplResource];	// reads (but doesn't retain) the template for this resource (TMPL resource with name equal to the passed resource's type)
 	
-	while(tmplResource = va_arg(resourceList, id))
+	while((tmplResource = va_arg(resourceList, id)))
 		NSLog(@"Too many params passed to -initWithResources:%@", [tmplResource description]);
 	va_end(resourceList);
 	
@@ -63,12 +98,6 @@
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[toolbarItems release];
-	[templateStructure release];
-	[resourceStructure release];
-	[(id)resource release];
-	[(id)backup release];
-	[super dealloc];
 }
 /*
 - (void)windowControllerDidLoadNib:(NSWindowController *)controller
@@ -109,7 +138,7 @@
 - (void)loadResource
 {
 	// create new stream
-	TemplateStream *stream = [TemplateStream streamWithBytes:(char *)[[resource data] bytes] length:[[resource data] length]];
+	TemplateStream *stream = [TemplateStream streamWithBytes:(char *)[[resource data] bytes] length:(UInt32)[[resource data] length]];
 	
 	// loop through template cloning its elements
 	Element *element;
@@ -117,20 +146,20 @@
 	NSEnumerator *enumerator = [templateStructure objectEnumerator];
 	while(element = [enumerator nextObject])
 	{
-		Element *clone = [[element copy] autorelease];	// copy the template object.
-//		NSLog(@"clone = %@; resourceStructure = %@", clone, resourceStructure);
+		Element *clone = [element copy];	// copy the template object.
+		//NSLog(@"clone = %@; resourceStructure = %@", clone, resourceStructure);
 		[resourceStructure addObject:clone];			// add it to our parsed resource data list. Do this right away so the element can append other items should it desire to.
 		[clone setParentArray:resourceStructure];		// the parent for these is the root level resourceStructure object
 		Class cc = [clone class];
 		
 		BOOL pushedCounter = NO;
-		BOOL pushedKey = NO;
+		//BOOL pushedKey = NO;
 		if(cc == [ElementOCNT class])
 		{	[stream pushCounter:(ElementOCNT *)clone]; pushedCounter = YES; }
 		if(cc == [ElementKBYT class] ||
 		   cc == [ElementKWRD class] ||
 		   cc == [ElementKLNG class] )
-		{	[stream pushKey:clone]; pushedKey = YES; }
+		{	[stream pushKey:clone]; /* pushedKey = YES; */ }
 		[clone readDataFrom:stream];				// fill it with resource data.
 		if(cc == [ElementLSTE class] && pushedCounter)
 			[stream popCounter];
@@ -141,8 +170,8 @@
 	// reload the view
 	id item;
 	[dataList reloadData];
-	int row = [dataList numberOfRows];
-	while(item = [dataList itemAtRow: --row])
+	NSInteger row = [dataList numberOfRows];
+	while((item = [dataList itemAtRow: --row]))
 	{
 		if([dataList isExpandable: item] && ![dataList isItemExpanded: item])
 			[dataList expandItem: item expandChildren: YES];
@@ -222,11 +251,11 @@
 	[resource setData:[[backup data] copy]];
 }
 
-- (void)readTemplate:(id<ResKnifeResourceProtocol>)tmplRes
+- (void)readTemplate:(id<ResKnifeResource>)tmplRes
 {
 	char *data = (char*) [[tmplRes data] bytes];
-	unsigned long bytesToGo = [[tmplRes data] length];
-	TemplateStream *stream = [TemplateStream streamWithBytes:data length:bytesToGo];
+	NSUInteger bytesToGo = [[tmplRes data] length];
+	TemplateStream *stream = [TemplateStream streamWithBytes:data length:(unsigned int)bytesToGo];
 	
 	// read new fields from the template and add them to our list
 	while([stream bytesToGo] > 0)
@@ -250,12 +279,12 @@
 #pragma mark -
 #pragma mark Table Management
 
-- (id)outlineView:(NSOutlineView*)outlineView child:(int)index ofItem:(id)item
+- (id)outlineView:(NSOutlineView*)outlineView child:(NSInteger)index ofItem:(id)item
 {
 	if((item == nil) && (outlineView == displayList))
-		return [templateStructure objectAtIndex:index];
+		return templateStructure[index];
 	else if((item == nil) && (outlineView == dataList))
-		return [resourceStructure objectAtIndex:index];
+		return resourceStructure[index];
 	else return [item subElementAtIndex:index];
 }
 
@@ -264,7 +293,7 @@
 	return ([item subElementCount] > 0);
 }
 
-- (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
+- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
 	if((item == nil) && (outlineView == displayList))
 		return [templateStructure count];
@@ -370,6 +399,11 @@
 	[createItem setAction:@selector(createListEntry:)];
 }
 
+- (NSString *)windowTitleForDocumentDisplayName:(NSString *)displayName
+{
+	return [resource defaultWindowTitle];
+}
+
 - (void)windowDidResignKey:(NSNotification *)notification
 {
 	NSMenu *resourceMenu = [[[NSApp mainMenu] itemAtIndex:3] submenu];
@@ -391,16 +425,16 @@ static NSString *RKTEDisplayTMPLIdentifier	= @"com.nickshanks.resknife.templatee
 	NSToolbarItem *item;
 	[toolbarItems removeAllObjects];	// just in case this method is called more than once per document (which it shouldn't be!)
 	
-	item = [[[NSToolbarItem alloc] initWithItemIdentifier:RKTEDisplayTMPLIdentifier] autorelease];
+	item = [[NSToolbarItem alloc] initWithItemIdentifier:RKTEDisplayTMPLIdentifier];
 	[item setLabel:NSLocalizedString(@"Parsed TMPL", nil)];
 	[item setPaletteLabel:NSLocalizedString(@"Display Parsed TMPL", nil)];
 	[item setToolTip:NSLocalizedString(@"Display Parsed TMPL", nil)];
 	[item setImage:[NSImage imageNamed:@"DisplayTMPL"]];
 	[item setTarget:tmplDrawer];
 	[item setAction:@selector(toggle:)];
-	[toolbarItems setObject:item forKey:RKTEDisplayTMPLIdentifier];
+	toolbarItems[RKTEDisplayTMPLIdentifier] = item;
 	
-	NSToolbar *toolbar = [[[NSToolbar alloc] initWithIdentifier:RKTEToolbarIdentifier] autorelease];
+	NSToolbar *toolbar = [[NSToolbar alloc] initWithIdentifier:RKTEToolbarIdentifier];
 	
 	// set toolbar properties
 	[toolbar setVisible:NO];
@@ -416,17 +450,17 @@ static NSString *RKTEDisplayTMPLIdentifier	= @"com.nickshanks.resknife.templatee
 
 - (NSToolbarItem *)toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)itemIdentifier willBeInsertedIntoToolbar:(BOOL)flag
 {
-	return [toolbarItems objectForKey:itemIdentifier];
+	return toolbarItems[itemIdentifier];
 }
 
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects:RKTEDisplayTMPLIdentifier, NSToolbarFlexibleSpaceItemIdentifier, NSToolbarPrintItemIdentifier, nil];
+    return @[RKTEDisplayTMPLIdentifier, NSToolbarFlexibleSpaceItemIdentifier, NSToolbarPrintItemIdentifier];
 }
 
 - (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects:RKTEDisplayTMPLIdentifier, NSToolbarPrintItemIdentifier, NSToolbarCustomizeToolbarItemIdentifier, NSToolbarFlexibleSpaceItemIdentifier, NSToolbarSpaceItemIdentifier, NSToolbarSeparatorItemIdentifier, nil];
+    return @[RKTEDisplayTMPLIdentifier, NSToolbarPrintItemIdentifier, NSToolbarCustomizeToolbarItemIdentifier, NSToolbarFlexibleSpaceItemIdentifier, NSToolbarSpaceItemIdentifier, NSToolbarSeparatorItemIdentifier];
 }
 
 @end
@@ -438,13 +472,13 @@ static NSString *RKTEDisplayTMPLIdentifier	= @"com.nickshanks.resknife.templatee
 - (void)keyDown:(NSEvent *)event
 {
 	Element *selectedItem = nil;
-	int selectedRow = [self selectedRow];
+	NSInteger selectedRow = [self selectedRow];
 	if(selectedRow != -1)
 		selectedItem = [self selectedItem];
 	
 	if(selectedItem && [selectedItem editable] && ([[event characters] isEqualToString:@"\r"] || [[event characters] isEqualToString:@"\t"]))
 		[self editColumn:1 row:selectedRow withEvent:nil select:YES];
-	else if(selectedItem && [selectedItem respondsToSelector:@selector(clear:)] && [[event characters] isEqualToString:[NSString stringWithCString:"\x7F"]])
+	else if(selectedItem && [selectedItem respondsToSelector:@selector(clear:)] && [[event characters] isEqualToString:@"\x7F"])
 		[[[self window] windowController] clear:nil];
 	else [super keyDown:event];
 }

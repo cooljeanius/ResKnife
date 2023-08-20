@@ -3,13 +3,18 @@
 #import "HexTextView.h"
 
 @implementation HexEditorDelegate
+@synthesize controller;
+@synthesize offset;
+@synthesize hex;
+@synthesize ascii;
+@synthesize message;
 
-- (id)init
+- (instancetype)init
 {
 	self = [super init];
 	if(!self) return nil;
 	
-	editedLow = NO;
+	self.editedLow = NO;
 	return self;
 }
 
@@ -25,29 +30,16 @@
 #endif /* 0 */
 }
 
-/* REMOVE THESE WHEN I.B. IS FIXED */
-- (void)setHex:(id)newView
-{
-	hex = newView;
-}
-
-- (void)setAscii:(id)newView
-{
-	ascii = newView;
-}
-/* END REMOVE MARKER */
-
 /* data re-representation methods */
-
 - (NSString *)offsetRepresentation:(NSData *)data
 {
-	int dataLength = [data length], bytesPerRow = [controller bytesPerRow];
-	int rows = (dataLength / bytesPerRow) + ((dataLength % bytesPerRow)? 1:0);
+	NSInteger dataLength = [data length], bytesPerRow = [controller bytesPerRow];
+	NSInteger rows = (dataLength / bytesPerRow) + ((dataLength % bytesPerRow)? 1:0);
 	NSMutableString *representation = [NSMutableString string];
-	int	row;
+	NSInteger	row;
 	
 	for( row = 0; row < rows; row++ )
-		[representation appendFormat:@"%08lX:", row * bytesPerRow];
+		[representation appendFormat:@"%08lX:", (unsigned long)(row * bytesPerRow)];
 	
 	return representation;
 }
@@ -107,33 +99,9 @@
 	return newSelectedCharRange;
 }
 
-- (HexWindowController *)controller
-{
-	return controller;
-}
-
-- (NSTextView *)hex
-{
-	return hex;
-}
-
-- (NSTextView *)ascii
-{
-	return ascii;
-}
-
-- (BOOL)editedLow
-{
-	return editedLow;
-}
-
-- (void)setEditedLow:(BOOL)flag
-{
-	editedLow = flag;
-}
-
 - (NSRange)rangeForUserTextChange
 {
+	NSRange rangeForUserTextChange = NSMakeRange(0, 0);
 	// if editing hex, convert hex selection to byte selection
 	if( [[controller window] firstResponder] == hex )
 		rangeForUserTextChange = [HexWindowController byteRangeFromHexRange:[hex rangeForUserTextChange]];

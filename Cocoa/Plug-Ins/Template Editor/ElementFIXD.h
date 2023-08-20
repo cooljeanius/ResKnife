@@ -1,14 +1,7 @@
 #import "Element.h"
 
 @interface ElementFIXD : Element
-{
-	Fixed value;
-}
-
-- (void)setValue:(Fixed)v;
-- (Fixed)value;
-
-- (NSString *)stringValue;
-- (void)setStringValue:(NSString *)str;
+@property Fixed value;
+@property (unsafe_unretained) NSString *stringValue;
 
 @end

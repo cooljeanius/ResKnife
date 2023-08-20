@@ -18,20 +18,19 @@ enum	// boom defaults
 @interface BoomWindowController : NovaWindowController
 {
 	BoomRec *boomRec;
-	
-	IBOutlet NSImageView *imageWell;
-	IBOutlet NSComboBox *graphicsField;
-	IBOutlet NSComboBox *soundField;
-	IBOutlet NSTextField *frameRateField;
-	IBOutlet NSButton *soundButton;
-	IBOutlet NSButton *playButton;
-	
-	// stuff
-	NSNumber *image;
-	NSNumber *sound;
-	NSNumber *frameRate;
-	BOOL silent;
 }
+
+@property (weak) IBOutlet NSImageView *imageWell;
+@property (weak) IBOutlet NSComboBox *graphicsField;
+@property (weak) IBOutlet NSComboBox *soundField;
+@property (weak) IBOutlet NSTextField *frameRateField;
+@property (weak) IBOutlet NSButton *soundButton;
+@property (weak) IBOutlet NSButton *playButton;
+
+@property short image;
+@property short sound;
+@property (strong) NSNumber *frameRate;
+@property (getter = isSilent) BOOL silent;
 
 - (void)update;
 - (void)controlTextDidChange:(NSNotification *)notification;

@@ -1,11 +1,11 @@
 #import <Cocoa/Cocoa.h>
 
-@interface OpenPanelDelegate : NSObject
+@interface OpenPanelDelegate : NSObject <NSOpenSavePanelDelegate>
 {
 /*!	@var openPanelAccessoryView	Accessory view for <tt>NSOpenPanels</tt>. */
 	IBOutlet NSView				*openPanelAccessoryView;
 /*!	@var forkTableView			Table view inside <tt>openPanelAccessoryView</tt>. */
-	IBOutlet NSTableView		*forkTableView;
+	__weak NSTableView			*forkTableView;
 /*!	@var addForkButton			Button for adding forks to a file. */
 	IBOutlet NSButton			*addForkButton;
 /*!	@var removeForkButton		Button for removing forks from a file. */
@@ -31,13 +31,12 @@
 - (NSView *)openPanelAccessoryView;
 
 /*!
-@method			forkTableView
+@property			forkTableView
 @abstract		Accessor method for the <tt>forkTableView</tt> instance variable.
 */
-- (NSTableView *)forkTableView;
+@property (weak) IBOutlet NSTableView *forkTableView;
 
 - (NSArray *)forks;
-- (void)setReadOpenPanelForFork:(BOOL)flag;
-- (BOOL)readOpenPanelForFork;
+@property BOOL readOpenPanelForFork;
 
 @end

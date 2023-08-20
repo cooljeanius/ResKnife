@@ -1,17 +1,21 @@
 #import "ElementFRAC.h"
 
 @implementation ElementFRAC
+@synthesize value;
+@dynamic stringValue;
 
 - (id)copyWithZone:(NSZone *)zone
 {
 	ElementFRAC *element = [super copyWithZone:zone];
-	[element setValue:value];
+	element.value = value;
 	return element;
 }
 
 - (void)readDataFrom:(TemplateStream *)stream
 {
-	[stream readAmount:sizeof(value) toBuffer:&value];
+	SInt32 tmp;
+	[stream readAmount:sizeof(value) toBuffer:&tmp];
+	value = CFSwapInt32BigToHost(tmp);
 }
 
 - (unsigned int)sizeOnDisk
@@ -21,17 +25,8 @@
 
 - (void)writeDataTo:(TemplateStream *)stream
 {
-	[stream writeAmount:sizeof(value) fromBuffer:&value];
-}
-
-- (void)setValue:(Fract)v
-{
-	value = v;
-}
-
-- (Fract)value
-{
-	return value;
+	SInt32 tmp = CFSwapInt32HostToBig(value);
+	[stream writeAmount:sizeof(value) fromBuffer:&tmp];
 }
 
 - (NSString *)stringValue
@@ -43,7 +38,7 @@
 {
 	char cstr[256];
 	char *endPtr = cstr + 255;
-	strncpy(cstr, [str cString], 255);
+	strncpy(cstr, [str cStringUsingEncoding:NSMacOSRomanStringEncoding], 255);
 	value = FloatToFract(strtof(cstr, &endPtr));
 }
 

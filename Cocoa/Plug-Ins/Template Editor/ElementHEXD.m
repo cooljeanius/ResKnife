@@ -1,11 +1,13 @@
 #import "ElementHEXD.h"
 
 @implementation ElementHEXD
+@synthesize value;
+@dynamic stringValue;
 
 - (id)copyWithZone:(NSZone *)zone
 {
 	ElementHEXD *element = [super copyWithZone:zone];
-	[element setValue:value];
+	element.value = value;
 	return element;
 }
 
@@ -27,24 +29,12 @@
 
 - (unsigned int)sizeOnDisk
 {
-	return [value length];
+	return (UInt32)[value length];
 }
 
 - (void)writeDataTo:(TemplateStream *)stream
 {
-	[stream writeAmount:[value length] fromBuffer:[value bytes]];
-}
-
-- (void)setValue:(NSData *)d
-{
-	id old = value;
-	value = [d retain];
-	[old release];
-}
-
-- (NSData *)value
-{
-	return value;
+	[stream writeAmount:(UInt32)[value length] fromBuffer:[value bytes]];
 }
 
 - (NSString *)stringValue

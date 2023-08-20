@@ -63,54 +63,52 @@
 	
 	// ncbs
 	IBOutlet NSForm *ncbForm;
-	
-	// ======
-	
-	// char
-	BOOL principalChar;
-	
-	// Initial Goodies
-	NSNumber *ship;
-	NSNumber *cash;
-	NSNumber *kills;
-	
-	// Beginning Of Time
-	NSCalendarDate *date;
-	NSString *prefix;
-	NSString *suffix;
-	
-	// Starting Location
-	NSNumber *start1;
-	NSNumber *start2;
-	NSNumber *start3;
-	NSNumber *start4;
-	
-	// Governments
-	NSNumber *status1;
-	NSNumber *status2;
-	NSNumber *status3;
-	NSNumber *status4;
-	NSNumber *government1;
-	NSNumber *government2;
-	NSNumber *government3;
-	NSNumber *government4;
-	
-	// Introduction
-	NSNumber *introText;
-	NSNumber *introPict1;
-	NSNumber *introPict2;
-	NSNumber *introPict3;
-	NSNumber *introPict4;
-	NSNumber *introDelay1;
-	NSNumber *introDelay2;
-	NSNumber *introDelay3;
-	NSNumber *introDelay4;
-	NSTimer *introPictTimer;
-	short currentPict;
-	
-	// Nova Control Bits
-	NSString *onStart;
 }
+
+@property (getter = isPrincipalChar) BOOL principalChar;
+
+// Initial Goodies
+@property short ship;
+@property int cash;
+@property short kills;
+
+// Beginning Of Time
+@property (strong) NSCalendarDate *date;
+@property (strong) NSString *prefix;
+@property (strong) NSString *suffix;
+
+// Starting Location
+@property short start1;
+@property short start2;
+@property short start3;
+@property short start4;
+
+// Governments
+@property short status1;
+@property short status2;
+@property short status3;
+@property short status4;
+@property short government1;
+@property short government2;
+@property short government3;
+@property short government4;
+
+// Introduction
+@property short introText;
+@property short introPict1;
+@property short introPict2;
+@property short introPict3;
+@property short introPict4;
+@property short introDelay1;
+@property short introDelay2;
+@property short introDelay3;
+@property short introDelay4;
+@property (strong) NSTimer *introPictTimer;
+@property short currentPict;
+
+// Nova Control Bits
+@property (strong) NSString *onStart;
+
 
 - (void)update;
 - (IBAction)editDate:(id)sender;

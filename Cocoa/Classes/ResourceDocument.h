@@ -1,48 +1,49 @@
 #import <Cocoa/Cocoa.h>
-#import <Carbon/Carbon.h>	// Actually I only need CarbonCore.framework
+#include <CoreServices/CoreServices.h>
 
-@class ResourceWindowController, ResourceDataSource, Resource;
+@class CreateResourceSheetController, ResourceWindowController, ResourceDataSource, Resource;
 
-@interface ResourceDocument : NSDocument
+@protocol ResKnifePlugin;
+
+@interface ResourceDocument : NSDocument <NSToolbarDelegate>
 {
 	IBOutlet ResourceDataSource		*dataSource;
 	IBOutlet NSWindow				*mainWindow;
 	IBOutlet NSOutlineView			*outlineView;
+
+	CreateResourceSheetController	*sheetController;
 	
 	NSMutableDictionary	*toolbarItems;
 	NSMutableArray	*resources;
-	HFSUniStr255	*fork;		// name of fork to save to, usually empty string (data fork) or 'RESOURCE_FORK' as returned from FSGetResourceForkName()
-	NSData			*creator;
-	NSData			*type;
+	HFSUniStr255	fork;		// name of fork to save to, usually empty string (data fork) or 'RESOURCE_FORK' as returned from FSGetResourceForkName()
 	BOOL			_createFork;	// file had no existing resource map when opened
 }
 
+@property OSType creator;
+@property OSType type;
+@property (weak) IBOutlet NSView *viewToolbarView;
+
 - (BOOL)readFork:(NSString *)forkName asStreamFromFile:(FSRef *)fileRef;
-- (BOOL)readResourceMap:(SInt16)fileRefNum;
-- (BOOL)writeResourceMap:(SInt16)fileRefNum;
+- (BOOL)readResourceMap:(ResFileRefNum)fileRefNum;
+- (BOOL)writeResourceMap:(ResFileRefNum)fileRefNum;
 - (BOOL)writeForkStreamsToFile:(NSString *)fileName;
 
 - (IBAction)exportResources:(id)sender;
 - (void)exportResource:(Resource *)resource;
-- (void)exportPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
-
-- (void)setupToolbar:(NSWindowController *)windowController;
 
 - (IBAction)showCreateResourceSheet:(id)sender;
 - (IBAction)showSelectTemplateSheet:(id)sender;
 - (IBAction)openResources:(id)sender;
 - (IBAction)openResourcesInTemplate:(id)sender;
 - (IBAction)openResourcesAsHex:(id)sender;
-- (void)openResourceUsingEditor:(Resource *)resource;
-- (void)openResource:(Resource *)resource usingTemplate:(NSString *)templateName;
-- (void)openResourceAsHex:(Resource *)resource;
+- (id <ResKnifePlugin>)openResourceUsingEditor:(Resource *)resource;
+- (id <ResKnifePlugin>)openResource:(Resource *)resource usingTemplate:(NSString *)templateName;
+- (id <ResKnifePlugin>)openResourceAsHex:(Resource *)resource;
 - (IBAction)playSound:(id)sender;
-- (void)sound:(NSSound *)sound didFinishPlaying:(BOOL)finished;
 
 - (IBAction)copy:(id)sender;
 - (IBAction)paste:(id)sender;
 - (void)pasteResources:(NSArray *)pastedResources;
-- (void)overwritePasteSheetDidDismiss:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 - (IBAction)clear:(id)sender;
 - (void)deleteResourcesSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 - (void)deleteSelectedResources;
@@ -57,12 +58,9 @@
 - (NSOutlineView *)outlineView;
 - (NSArray *)resources;		// return the array as non-mutable
 
-- (NSData *)creator;
-- (NSData *)type;
 - (IBAction)creatorChanged:(id)sender;
 - (IBAction)typeChanged:(id)sender;
-- (BOOL)setCreator:(NSData *)newCreator;
-- (BOOL)setType:(NSData *)newType;
-- (BOOL)setCreator:(NSData *)newCreator andType:(NSData *)newType;
+- (BOOL)setCreator:(OSType)newCreator andType:(OSType)newType;
+- (IBAction)changeView:(id)sender;
 
 @end

@@ -4,7 +4,7 @@
 	
 	PURPOSE:	This is the main class of our bitmap resource editor. Every
 				resource editor's main class implements the
-				ResKnifePluginProtocol. Every editor should implement
+				ResKnifePlugin. Every editor should implement
 				initWithResource:. Only implement initWithResources: if you feel
 				like writing a template editor.
 				
@@ -28,6 +28,7 @@
 
 
 @implementation ICONWindowController
+@synthesize imageView;
 
 
 /* -----------------------------------------------------------------------------
@@ -38,12 +39,12 @@
 		resource.
    -------------------------------------------------------------------------- */
 
--(id)   initWithResource: (id)newResource
+- (instancetype)initWithResource:(id<ResKnifeResource>)newResource
 {
 	self = [self initWithWindowNibName:@"ICONWindow"];
 	if( !self ) return nil;
 	
-	resource = [newResource retain];
+	resource = newResource;
 	resData = nil;
 	resImage = nil;
 	
@@ -57,13 +58,9 @@
 	* DESTRUCTOR
    -------------------------------------------------------------------------- */
 
--(void) dealloc
+- (void)dealloc
 {
-	[resImage autorelease];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[(id)resource autorelease];
-	[resData release];
-	[super dealloc];
 }
 
 
@@ -72,43 +69,65 @@
 		Loads the resource's data into our NSImageView.
    -------------------------------------------------------------------------- */
 
--(void) reloadResData
+-(void)reloadResData
 {
 	unsigned char*			planes[2] = { 0, 0 };
 	NSBitmapImageRep*		bir;
-	NSString*				resType = [resource type];
+	OSType					resType = [resource type];
 	
-	[resImage autorelease];
 	resImage = [[NSImage alloc] init];
 	
-	resData = [[resource data] retain];
+	// -mutableCopy the data instead of retaining, so we don't get inverted pixels on reopening the resource
+	// (since switching to NSCalibratedWhiteColorSpace)
+	resData = [[resource data] mutableCopy];
 	planes[0] = (unsigned char*) [resData bytes];
+	NSUInteger plane0length = 0;
+	NSUInteger pixelsWide = 32;
+	NSUInteger pixelsHigh = 32;
+	BOOL hasAlpha = YES;
+	BOOL isPlanar = YES;
+	NSUInteger bytesPerRow = 0;
+	NSUInteger samplesPerPixel = 2;
 	
-	if( [resType isEqualToString: @"ICN#"] )
-	{
-		planes[1] = planes[0] + (4 * 32);   // 32 lines a 4 bytes.
-		bir = [[[NSBitmapImageRep alloc] autorelease] initWithBitmapDataPlanes:planes pixelsWide:32 pixelsHigh:32
-				bitsPerSample:1 samplesPerPixel:2 hasAlpha:YES isPlanar:YES colorSpaceName:NSCalibratedBlackColorSpace
-				bytesPerRow:4 bitsPerPixel:1];
+	switch (resType) {
+		case 'ICN#':
+			bytesPerRow = 4;
+			break;
+			
+		case 'ics#':
+		case 'CURS':
+			bytesPerRow = 2;
+			pixelsWide = pixelsHigh = 16;
+			break;
+			
+		case 'icm#':
+			bytesPerRow = 2;
+			pixelsWide = 16;
+			pixelsHigh = 12;
+			break;
+			
+		default:
+			bytesPerRow = 4;
+			hasAlpha = NO;
+			isPlanar = NO;
+			samplesPerPixel = 1;
+			
+			break;
 	}
-	else if( [resType isEqualToString: @"ics#"] || [resType isEqualToString: @"CURS"] )
-	{
-		planes[1] = planes[0] + (2 * 16);   // 16 lines a 2 bytes.
-		bir = [[[NSBitmapImageRep alloc] autorelease] initWithBitmapDataPlanes:planes pixelsWide:16 pixelsHigh:16
-				bitsPerSample:1 samplesPerPixel:2 hasAlpha:YES isPlanar:YES colorSpaceName:NSCalibratedBlackColorSpace
-				bytesPerRow:2 bitsPerPixel:1];
-	}
-	else if( [resType isEqualToString: @"icm#"] )
-	{
-		planes[1] = planes[0] + (2 * 12);   // 12 lines a 2 bytes.
-		bir = [[[NSBitmapImageRep alloc] autorelease] initWithBitmapDataPlanes:planes pixelsWide:16 pixelsHigh:12
-				bitsPerSample:1 samplesPerPixel:2 hasAlpha:YES isPlanar:YES colorSpaceName:NSCalibratedBlackColorSpace
-				bytesPerRow:2 bitsPerPixel:1];
-	}
-	else
-		bir = [[[NSBitmapImageRep alloc] autorelease] initWithBitmapDataPlanes:planes pixelsWide:32 pixelsHigh:32
-				bitsPerSample:1 samplesPerPixel:1 hasAlpha:NO isPlanar:NO colorSpaceName:NSCalibratedBlackColorSpace
-				bytesPerRow:4 bitsPerPixel:1]; 
+	
+	plane0length = bytesPerRow * pixelsHigh;
+	
+	if (isPlanar)
+		planes[1] = planes[0] + plane0length;
+	
+	for (NSUInteger i = 0; i < plane0length; ++i)
+		planes[0][i] ^= 0xff;
+	
+	bir = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes:planes pixelsWide:pixelsWide pixelsHigh:pixelsHigh
+												bitsPerSample:1 samplesPerPixel:samplesPerPixel hasAlpha:hasAlpha
+													 isPlanar:isPlanar colorSpaceName:NSCalibratedWhiteColorSpace
+												  bytesPerRow:bytesPerRow bitsPerPixel:1];
+	
 	
 	[resImage addRepresentation:bir];
 	[imageView setImage: resImage];
@@ -161,14 +180,14 @@
 		format and stash it in our resource.
    -------------------------------------------------------------------------- */
 
--(IBAction)		imageViewChanged: (id)sender
+- (IBAction)imageViewChanged: (id)sender
 {
-	NSArray*	reps = [resImage representations];
+	NSArray* reps = [resImage representations];
 	
-	NSLog( @"# %d", [reps count] );
+	NSLog( @"# %lu", (unsigned long)[reps count] );
 	
-	[resImage lockFocusOnRepresentation: [reps objectAtIndex:0]];
-	[[imageView image] dissolveToPoint: NSMakePoint(0,0) fraction:1];
+	[resImage lockFocusOnRepresentation: reps[0]];
+	[[imageView image] drawAtPoint: NSZeroPoint fromRect: NSZeroRect operation:NSCompositingOperationCopy fraction:1];
 	[resImage unlockFocus];
 	
 	[imageView setImage: resImage];

@@ -1,15 +1,8 @@
 #import <Cocoa/Cocoa.h>
 
 @interface ResourceNameCell : NSTextFieldCell
-{
-	BOOL	drawImage;
-	NSImage	*image;
-}
-
-- (BOOL)drawsImage;
-- (void)setDrawsImage:(BOOL)flag;
-- (NSImage *)image;
-- (void)setImage:(NSImage *)anImage;
+@property BOOL drawImage;
+@property (retain, nonatomic) NSImage *image;
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView;
 - (NSSize)cellSize;

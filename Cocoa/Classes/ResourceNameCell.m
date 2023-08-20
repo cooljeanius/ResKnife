@@ -1,42 +1,26 @@
 #import "ResourceNameCell.h"
 
 @implementation ResourceNameCell
+@synthesize image;
+@synthesize drawImage;
 
-- (id)init
+- (instancetype)init
 {
-	self = [super init];
-	if(!self) return nil;
-	[self setWraps:NO];
-	drawImage = YES;
+	if (self = [super init]) {
+		self.wraps = NO;
+		drawImage = YES;
+		image = nil;
+	}
 	return self;
-}
-
-- (void)dealloc
-{
-	[image release];
-	[super dealloc];
 }
 
 - copyWithZone:(NSZone *)zone
 {
-	ResourceNameCell *cell = (ResourceNameCell *)[super copyWithZone:zone];
-	(* cell).image = [image retain];
+	ResourceNameCell *cell = nil;
+	if ((cell = [super copyWithZone:zone])) {
+		cell.image = image;
+	}
 	return cell;
-}
-
-- (BOOL)drawsImage
-{
-	return drawImage;
-}
-
-- (void)setDrawsImage:(BOOL)flag
-{
-	drawImage = flag;
-}
-
-- (NSImage *)image
-{
-	return image;
 }
 
 - (void)setImage:(NSImage *)newImage
@@ -44,11 +28,8 @@
 	if(image != newImage)
 	{
 		// save image and set to 16x16 pixels
-		id old = image;
-		image = [newImage retain];
-		[image setScalesWhenResized:YES];
+		image = newImage;
 		[image setSize:NSMakeSize(16,16)];
-		[old release];
 	}
 }
 
@@ -82,7 +63,7 @@
 	}
 }
 
-- (void)selectWithFrame:(NSRect)cellFrame inView:(NSView *)controlView editor:(NSText *)textObject delegate:(id)delegateObject start:(int)selStart length:(int)selLength
+- (void)selectWithFrame:(NSRect)cellFrame inView:(NSView *)controlView editor:(NSText *)textObject delegate:(id)delegateObject start:(NSInteger)selStart length:(NSInteger)selLength
 {
 	if(drawImage == YES)
 	{
@@ -115,12 +96,22 @@
 		imageFrame.size = imageSize;
 		
 		// center vertically
-		if([controlView isFlipped])
-			imageFrame.origin.y += ceil((cellFrame.size.height + imageFrame.size.height) / 2);
-		else imageFrame.origin.y += ceil((cellFrame.size.height - imageFrame.size.height) / 2);
-		
+		imageFrame.origin.y += ceil((cellFrame.size.height - imageFrame.size.height) / 2.0);
+
+		NSAffineTransform *t = nil;
+
+		if ([controlView isFlipped]) {
+			t = [NSAffineTransform transform];
+			[t translateXBy:0.0 yBy:cellFrame.origin.y * 2.0 + cellFrame.size.height];
+			[t scaleXBy:1.0 yBy:-1.0];
+			[t concat];
+		}
+
 		// draw image
-		[image compositeToPoint:imageFrame.origin operation:NSCompositeSourceOver];
+		[image drawInRect:imageFrame fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+
+		if ([controlView isFlipped])
+			[t concat];
 	}
 	
 	// get the superclass to draw the text stuff

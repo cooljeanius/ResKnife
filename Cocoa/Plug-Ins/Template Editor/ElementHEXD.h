@@ -1,13 +1,7 @@
 #import "Element.h"
 
 @interface ElementHEXD : Element
-{
-	NSData *value;
-}
-- (void)setValue:(NSData *)d;
-- (NSData *)value;
-
-- (NSString *)stringValue;
-- (void)setStringValue:(NSString *)str;
+@property (copy) NSData *value;
+@property (unsafe_unretained) NSString *stringValue;
 
 @end

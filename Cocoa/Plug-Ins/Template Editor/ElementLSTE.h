@@ -4,21 +4,11 @@
 @class ElementOCNT;
 @class ElementLSTB;
 @interface ElementLSTE : Element
-{
-	ElementLSTB *groupElementTemplate;	// The item of which we're to create a copy.
-	ElementOCNT *countElement;			// The "counter" element if we're the end of an LSTC list.
-	BOOL writesZeroByte;				// Write a terminating zero-byte when writing out this item (used by LSTZ).
-}
+@property (unsafe_unretained) NSString *stringValue;
+@property BOOL writesZeroByte;							// Write a terminating zero-byte when writing out this item (used by LSTZ).
+@property (strong) ElementLSTB *groupElementTemplate;	// The item of which we're to create a copy.
+@property (weak) ElementOCNT *countElement;				// The "counter" element if we're the end of an LSTC list.
 
 - (IBAction)createListEntry:(id)sender;
-
-- (void)setWritesZeroByte:(BOOL)n;
-- (BOOL)writesZeroByte;
-
-- (void)setGroupElementTemplate:(ElementLSTB *)e;
-- (ElementLSTB *)groupElementTemplate;
-
-- (void)setCountElement:(ElementOCNT *)e;
-- (ElementOCNT *)countElement;
 
 @end

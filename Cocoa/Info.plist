@@ -2,18 +2,20 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
+	<string>en</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>rsrc</string>
-				<string>*</string>
+				<string>rsr</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>Resource file.icns</string>
+			<string>Resource file</string>
 			<key>CFBundleTypeName</key>
 			<string>ResourceMap</string>
 			<key>CFBundleTypeOSTypes</key>
@@ -29,18 +31,40 @@
 			<array>
 				<string>com.apple.resource-map</string>
 			</array>
+			<key>LSTypeIsPackage</key>
+			<false/>
+			<key>NSDocumentClass</key>
+			<string>ResourceDocument</string>
+		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>*</string>
+			</array>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>*/*</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Anything</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>LSTypeIsPackage</key>
+			<false/>
 			<key>NSDocumentClass</key>
 			<string>ResourceDocument</string>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
-	<string>ResKnife Cocoa</string>
+	<string>${EXECUTABLE_FILE}</string>
 	<key>CFBundleGetInfoString</key>
 	<string>A resource editor for Mac OS X.</string>
-	<key>CFBundleIconFile</key>
-	<string>ResKnife.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.nickshanks.resknife</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -52,7 +76,7 @@
 	<key>CFBundleSignature</key>
 	<string>ResK</string>
 	<key>CFBundleVersion</key>
-	<string>19</string>
+	<string>23</string>
 	<key>NSAppleScriptEnabled</key>
 	<true/>
 	<key>NSMainNibFile</key>
@@ -82,7 +106,10 @@
 					<string>RSRC</string>
 				</array>
 				<key>public.filename-extension</key>
-				<string>rsrc</string>
+				<array>
+					<string>rsrc</string>
+					<string>rsr</string>
+				</array>
 			</dict>
 		</dict>
 	</array>

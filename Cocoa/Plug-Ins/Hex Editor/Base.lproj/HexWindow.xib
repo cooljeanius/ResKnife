@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="HexWindowController">
+            <connections>
+                <outlet property="textView" destination="89" id="90"/>
+                <outlet property="window" destination="36" id="37"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="Untitled Resource" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" visibleAtLaunch="NO" animationBehavior="default" id="36" userLabel="Hex Window">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="387" y="534" width="570" height="319"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2069" height="1183"/>
+            <value key="minSize" type="size" width="300" height="140"/>
+            <view key="contentView" id="35">
+                <rect key="frame" x="0.0" y="0.0" width="570" height="319"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="89" customClass="HFTextView">
+                        <rect key="frame" x="0.0" y="0.0" width="570" height="319"/>
+                    </customView>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="89" firstAttribute="top" secondItem="35" secondAttribute="top" id="Lbc-WD-ZCq"/>
+                    <constraint firstAttribute="trailing" secondItem="89" secondAttribute="trailing" id="dzv-Wr-QDH"/>
+                    <constraint firstAttribute="bottom" secondItem="89" secondAttribute="bottom" id="kd8-uo-IN6"/>
+                    <constraint firstItem="89" firstAttribute="leading" secondItem="35" secondAttribute="leading" id="sap-uy-aFS"/>
+                </constraints>
+            </view>
+            <connections>
+                <outlet property="delegate" destination="-2" id="68"/>
+            </connections>
+        </window>
+    </objects>
+</document>

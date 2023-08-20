@@ -2,12 +2,8 @@
 #import "Element.h"
 
 @interface ElementKEYB : Element
-{
-	NSMutableArray *subElements;
-}
-
-- (void)setSubElements:(NSMutableArray *)a;
-- (NSMutableArray *)subElements;
+@property (unsafe_unretained) NSString *stringValue;
+@property (strong) NSMutableArray *subElements;
 
 @end
 

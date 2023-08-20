@@ -1,8 +1,79 @@
 #import "CharWindowController.h"
+#import "Resource.h"
 
 @implementation CharWindowController
+@synthesize principalChar;
 
-- (id)initWithResource:(id <ResKnifeResourceProtocol>)newResource
+// Initial Goodies
+@synthesize ship;
+@synthesize cash;
+@synthesize kills;
+
+// Beginning Of Time
+@synthesize date;
+@synthesize prefix;
+@synthesize suffix;
+
+// Starting Location
+@synthesize start1;
+@synthesize start2;
+@synthesize start3;
+@synthesize start4;
+
+// Governments
+@synthesize status1;
+@synthesize status2;
+@synthesize status3;
+@synthesize status4;
+@synthesize government1;
+@synthesize government2;
+@synthesize government3;
+@synthesize government4;
+
+// Introduction
+@synthesize introText;
+@synthesize introPict1;
+@synthesize introPict2;
+@synthesize introPict3;
+@synthesize introPict4;
+@synthesize introDelay1;
+@synthesize introDelay2;
+@synthesize introDelay3;
+@synthesize introDelay4;
+@synthesize introPictTimer;
+@synthesize currentPict;
+
+// Nova Control Bits
+@synthesize onStart;
+
+static void BSwapCharRec(CharRec* toSwap)
+{
+	toSwap->startCash = CFSwapInt32BigToHost(toSwap->startCash);
+	toSwap->startShipType = CFSwapInt16BigToHost(toSwap->startShipType);
+	dispatch_apply(4, dispatch_get_global_queue(0, 0), ^(size_t i) {
+		toSwap->startSystem[i] = CFSwapInt16BigToHost(toSwap->startSystem[i]);
+	});
+	dispatch_apply(4, dispatch_get_global_queue(0, 0), ^(size_t i) {
+		toSwap->startGovt[i] = CFSwapInt16BigToHost(toSwap->startGovt[i]);
+	});
+	dispatch_apply(4, dispatch_get_global_queue(0, 0), ^(size_t i) {
+		toSwap->startStatus[i] = CFSwapInt16BigToHost(toSwap->startStatus[i]);
+	});
+	toSwap->startKills = CFSwapInt16BigToHost(toSwap->startKills);
+	dispatch_apply(4, dispatch_get_global_queue(0, 0), ^(size_t i) {
+		toSwap->introPictID[i] = CFSwapInt16BigToHost(toSwap->introPictID[i]);
+	});
+	dispatch_apply(4, dispatch_get_global_queue(0, 0), ^(size_t i) {
+		toSwap->introPictDelay[i] = CFSwapInt16BigToHost(toSwap->introPictDelay[i]);
+	});
+	toSwap->introTextID = CFSwapInt16BigToHost(toSwap->introTextID);
+	toSwap->Flags = CFSwapInt16BigToHost(toSwap->Flags);
+	toSwap->startDay = CFSwapInt16BigToHost(toSwap->startDay);
+	toSwap->startMonth = CFSwapInt16BigToHost(toSwap->startMonth);
+	toSwap->startYear = CFSwapInt16BigToHost(toSwap->startYear);
+}
+
+- (instancetype)initWithResource:(id <ResKnifeResource>)newResource
 {
 	NSString *tempPrefix;
 	NSString *tempSuffix;
@@ -14,14 +85,15 @@
 	// load data from resource
 	charRec = (CharRec *) calloc( 1, sizeof(CharRec) );
 	[[newResource data] getBytes:charRec];
+	BSwapCharRec(charRec);
 	
 	// fill in default values if necessary
 	if( charRec->startYear == 0 || charRec->startMonth == 0 || charRec->startDay == 0 )
 	{
 		NSCalendarDate *today = [NSCalendarDate calendarDate];
-		charRec->startDay = [today dayOfMonth];
-		charRec->startMonth = [today monthOfYear];
-		charRec->startYear = [today yearOfCommonEra];
+		charRec->startDay = (short)[today dayOfMonth];
+		charRec->startMonth = (short)[today monthOfYear];
+		charRec->startYear = (short)[today yearOfCommonEra];
 	}
 	
 	// set ship to -1 if unused
@@ -65,49 +137,43 @@
 		charRec->introPictDelay[3] = -1;
 	
 	// use resource values to create NS objects
-	principalChar = charRec->Flags & 0x0001;
-	ship = [[NSNumber alloc] initWithShort:charRec->startShipType];	// resID
-	cash = [[NSNumber alloc] initWithLong:charRec->startCash];
-	kills = [[NSNumber alloc] initWithShort:charRec->startKills];
-	date = [[NSCalendarDate alloc] initWithYear:charRec->startYear month:charRec->startMonth day:charRec->startDay hour:0 minute:0 second:0 timeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
-	tempPrefix = [[[NSString alloc] initWithData:[NSData dataWithBytes:charRec->Prefix length:16] encoding:NSMacOSRomanStringEncoding] autorelease];
-	prefix = [[NSString alloc] initWithCString:[tempPrefix cString] length:[tempPrefix cStringLength]];
-	tempSuffix = [[[NSString alloc] initWithData:[NSData dataWithBytes:charRec->Suffix length:16] encoding:NSMacOSRomanStringEncoding] autorelease];
-	suffix = [[NSString alloc] initWithCString:[tempSuffix cString] length:[tempSuffix cStringLength]];
-	start1 = [[NSNumber alloc] initWithShort:charRec->startSystem[0]];
-	start2 = [[NSNumber alloc] initWithShort:charRec->startSystem[1]];
-	start3 = [[NSNumber alloc] initWithShort:charRec->startSystem[2]];
-	start4 = [[NSNumber alloc] initWithShort:charRec->startSystem[3]];
-	status1 = [[NSNumber alloc] initWithShort:charRec->startStatus[0]];
-	status2 = [[NSNumber alloc] initWithShort:charRec->startStatus[1]];
-	status3 = [[NSNumber alloc] initWithShort:charRec->startStatus[2]];
-	status4 = [[NSNumber alloc] initWithShort:charRec->startStatus[3]];
-	government1 = [[NSNumber alloc] initWithShort:charRec->startGovt[0]];
-	government2 = [[NSNumber alloc] initWithShort:charRec->startGovt[1]];
-	government3 = [[NSNumber alloc] initWithShort:charRec->startGovt[2]];
-	government4 = [[NSNumber alloc] initWithShort:charRec->startGovt[3]];
-	introText = [[NSNumber alloc] initWithShort:charRec->introTextID];
-	introPict1 = [[NSNumber alloc] initWithShort:charRec->introPictID[0]];
-	introPict2 = [[NSNumber alloc] initWithShort:charRec->introPictID[1]];
-	introPict3 = [[NSNumber alloc] initWithShort:charRec->introPictID[2]];
-	introPict4 = [[NSNumber alloc] initWithShort:charRec->introPictID[3]];
-	introDelay1 = [[NSNumber alloc] initWithShort:charRec->introPictDelay[0]];
-	introDelay2 = [[NSNumber alloc] initWithShort:charRec->introPictDelay[1]];
-	introDelay3 = [[NSNumber alloc] initWithShort:charRec->introPictDelay[2]];
-	introDelay4 = [[NSNumber alloc] initWithShort:charRec->introPictDelay[3]];
-	tempStart = [[[NSString alloc] initWithData:[NSData dataWithBytes:charRec->OnStart length:256] encoding:NSMacOSRomanStringEncoding] autorelease];
-	onStart = [[NSString alloc] initWithCString:[tempStart cString] length:[tempStart cStringLength]];
+	self.principalChar = charRec->Flags & 0x0001;
+	self.ship = charRec->startShipType;	// resID
+	self.cash = charRec->startCash;
+	self.kills = charRec->startKills;
+	self.date = [[NSCalendarDate alloc] initWithYear:charRec->startYear month:charRec->startMonth day:charRec->startDay hour:0 minute:0 second:0 timeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
+	tempPrefix = [[NSString alloc] initWithData:[NSData dataWithBytes:charRec->Prefix length:16] encoding:NSMacOSRomanStringEncoding];
+	self.prefix = tempPrefix;
+	tempSuffix = [[NSString alloc] initWithData:[NSData dataWithBytes:charRec->Suffix length:16] encoding:NSMacOSRomanStringEncoding];
+	self.suffix = tempSuffix;
+	self.start1 = charRec->startSystem[0];
+	self.start2 = charRec->startSystem[1];
+	self.start3 = charRec->startSystem[2];
+	self.start4 = charRec->startSystem[3];
+	self.status1 = charRec->startStatus[0];
+	self.status2 = charRec->startStatus[1];
+	self.status3 = charRec->startStatus[2];
+	self.status4 = charRec->startStatus[3];
+	self.government1 = charRec->startGovt[0];
+	self.government2 = charRec->startGovt[1];
+	self.government3 = charRec->startGovt[2];
+	self.government4 = charRec->startGovt[3];
+	self.introText = charRec->introTextID;
+	self.introPict1 = charRec->introPictID[0];
+	self.introPict2 = charRec->introPictID[1];
+	self.introPict3 = charRec->introPictID[2];
+	self.introPict4 = charRec->introPictID[3];
+	self.introDelay1 = charRec->introPictDelay[0];
+	self.introDelay2 = charRec->introPictDelay[1];
+	self.introDelay3 = charRec->introPictDelay[2];
+	self.introDelay4 = charRec->introPictDelay[3];
+	tempStart = [[NSString alloc] initWithData:[NSData dataWithBytes:charRec->OnStart length:256] encoding:NSMacOSRomanStringEncoding];
+	self.onStart = tempStart;
 	
 	// rotating image
-	currentPict = 0;
+	self.currentPict = 0;
 	
 	return self;
-}
-
-- (void)dealloc
-{
-	// bug: release everything
-	[super dealloc];
 }
 
 - (void)windowDidLoad
@@ -150,9 +216,9 @@
 	[localCenter addObserver:self selector:@selector(controlTextDidChange:) name:NSControlTextDidChangeNotification object:nil];
 	
 	// mark window changed if initial values were invalid
-	if( ![[resource data] isEqualToData:[NSData dataWithBytes:charRec length:sizeof(CharRec)]] )
+	if( ![[self.resource data] isEqualToData:[NSData dataWithBytes:charRec length:sizeof(CharRec)]] )
 	{
-		[resource touch];
+		[self.resource touch];
 		[self setDocumentEdited:YES];
 	}
 	
@@ -169,20 +235,20 @@
 	NSData *stringData;
 	
 	// principal character
-	[principalCharButton setState:principalChar];
+	[principalCharButton setState:self.principalChar];
 	
 	// initial goodies
 	[shipField setObjectValue:[shipDataSource stringValueForResID:ship]];
-	[cashField setObjectValue:cash];
-	[killsField setObjectValue:kills];
+	[cashField setIntegerValue:cash];
+	[killsField setIntegerValue:kills];
 	
 	// beginning of time
 	[dayField setObjectValue:date];
 	[monthField setObjectValue:date];
 	[yearField setObjectValue:date];
-	[dayStepper setIntValue:[date dayOfMonth]];
-	[monthStepper setIntValue:[date monthOfYear]];
-	[yearStepper setIntValue:[date yearOfCommonEra]];
+	[dayStepper setIntegerValue:[date dayOfMonth]];
+	[monthStepper setIntegerValue:[date monthOfYear]];
+	[yearStepper setIntegerValue:[date yearOfCommonEra]];
 	[prefixField setStringValue:prefix];
 	[suffixField setStringValue:suffix];
 	
@@ -193,31 +259,31 @@
 	[startField4 setObjectValue:[planetDataSource stringValueForResID:start4]];
 	
 	// governments
-	[statusField1 setObjectValue:status1];
-	[statusField2 setObjectValue:status2];
-	[statusField3 setObjectValue:status3];
-	[statusField4 setObjectValue:status4];
+	[statusField1 setIntegerValue:status1];
+	[statusField2 setIntegerValue:status2];
+	[statusField3 setIntegerValue:status3];
+	[statusField4 setIntegerValue:status4];
 	[governmentField1 setObjectValue:[governmentDataSource stringValueForResID:government1]];
 	[governmentField2 setObjectValue:[governmentDataSource stringValueForResID:government2]];
 	[governmentField3 setObjectValue:[governmentDataSource stringValueForResID:government3]];
 	[governmentField4 setObjectValue:[governmentDataSource stringValueForResID:government4]];
 	
 	// intro text & pics
-	[introDelayField1 setObjectValue:introDelay1];
-	[introDelayField2 setObjectValue:introDelay2];
-	[introDelayField3 setObjectValue:introDelay3];
-	[introDelayField4 setObjectValue:introDelay4];
+	[introDelayField1 setIntValue:introDelay1];
+	[introDelayField2 setIntValue:introDelay2];
+	[introDelayField3 setIntValue:introDelay3];
+	[introDelayField4 setIntValue:introDelay4];
 	[introPictField1 setObjectValue:[pictureDataSource stringValueForResID:introPict1]];
 	[introPictField2 setObjectValue:[pictureDataSource stringValueForResID:introPict2]];
 	[introPictField3 setObjectValue:[pictureDataSource stringValueForResID:introPict3]];
 	[introPictField4 setObjectValue:[pictureDataSource stringValueForResID:introPict4]];
 	[introTextField setObjectValue:[descriptionDataSource stringValueForResID:introText]];
 	
-	stringData = [(id <ResKnifeResourceProtocol>)[NSClassFromString(@"Resource") getResourceOfType:[plugBundle localizedStringForKey:@"desc" value:@"" table:@"Resource Types"] andID:introText inDocument:nil] data];
+	stringData = [(id <ResKnifeResource>)[NSClassFromString(@"Resource") getResourceOfType:GetOSTypeFromNSString([plugBundle localizedStringForKey:@"desc" value:@"" table:@"Resource Types"]) andID:introText inDocument:nil] data];
 	if( stringData != nil )
 	{
-		[introTextView setString:[[[NSString alloc] initWithData:stringData encoding:NSMacOSRomanStringEncoding] autorelease]];
-//		[introTextView scrollToTop];	// bug: made up method - needs implementing
+		[introTextView setString:[[NSString alloc] initWithData:stringData encoding:NSMacOSRomanStringEncoding]];
+		// [introTextView scrollToTop];	// bug: made up method - needs implementing
 	}
 	// ncbs
 	[onStartField setStringValue:onStart];
@@ -225,24 +291,20 @@
 
 - (IBAction)editDate:(id)sender
 {
-	id old = date;
 	date = [[NSCalendarDate alloc] initWithYear:[yearField intValue] month:[monthField intValue] day:[dayField intValue] hour:0 minute:0 second:0 timeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
-	[old release];
 	[self update];
 }
 
 - (IBAction)stepDate:(id)sender
 {
-	id old = date;
 	date = [[NSCalendarDate alloc] initWithYear:[yearStepper intValue] month:[monthStepper intValue] day:[dayStepper intValue] hour:0 minute:0 second:0 timeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
-	[old release];
 	[self update];
 }
 
 - (IBAction)togglePrincipalChar:(id)sender
 {
-	principalChar = [principalCharButton state];
-	[resource touch];
+	self.principalChar = [principalCharButton state] ? YES : NO;
+	[self.resource touch];
 	[self setDocumentEdited:YES];
 }
 
@@ -254,10 +316,10 @@
 - (void)rotateIntroPict:(NSTimer *)timer
 {
 	// identify next frame
-	currentPict++;
-	if( currentPict == 2 && [introPict2 intValue] == -1 )		currentPict = 1;
-	else if( currentPict == 3 && [introPict3 intValue] == -1 )	currentPict = 1;
-	else if( currentPict == 4 && [introPict4 intValue] == -1 )	currentPict = 1;
+	self.currentPict++;
+	if( self.currentPict == 2 && self.introPict2 == -1 )		currentPict = 1;
+	else if( currentPict == 3 && introPict3 == -1 )	currentPict = 1;
+	else if( currentPict == 4 && introPict4 == -1 )	currentPict = 1;
 	else if( currentPict > 4 )									currentPict = 1;
 	
 	// install new timer
@@ -265,30 +327,30 @@
 	{
 		case 1:
 			// install new timer
-			introPictTimer = [NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)[introDelay1 doubleValue] target:self selector:@selector(rotateIntroPict:) userInfo:nil repeats:NO];
+			introPictTimer = [NSTimer scheduledTimerWithTimeInterval:introDelay1 target:self selector:@selector(rotateIntroPict:) userInfo:nil repeats:NO];
 			// set next picture
-			[introImageView setImage:[[[NSImage alloc] initWithData:[(id <ResKnifeResourceProtocol>)[NSClassFromString(@"Resource") getResourceOfType:[plugBundle localizedStringForKey:@"PICT" value:@"" table:@"Resource Types"] andID:introPict1 inDocument:nil] data]] autorelease]];
+			[introImageView setImage:[[NSImage alloc] initWithData:[(id <ResKnifeResource>)[NSClassFromString(@"Resource") getResourceOfType:'PICT' andID:introPict1 inDocument:nil] data]]];
 			break;
 	
 		case 2:
 			// install new timer
-			introPictTimer = [NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)[introDelay2 doubleValue] target:self selector:@selector(rotateIntroPict:) userInfo:nil repeats:NO];
+			introPictTimer = [NSTimer scheduledTimerWithTimeInterval:introDelay2 target:self selector:@selector(rotateIntroPict:) userInfo:nil repeats:NO];
 			// set next picture
-			[introImageView setImage:[[[NSImage alloc] initWithData:[(id <ResKnifeResourceProtocol>)[NSClassFromString(@"Resource") getResourceOfType:[plugBundle localizedStringForKey:@"PICT" value:@"" table:@"Resource Types"] andID:introPict2 inDocument:nil] data]] autorelease]];
+			[introImageView setImage:[[NSImage alloc] initWithData:[(id <ResKnifeResource>)[NSClassFromString(@"Resource") getResourceOfType:'PICT' andID:introPict2 inDocument:nil] data]]];
 			break;
 	
 		case 3:
 			// install new timer
-			introPictTimer = [NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)[introDelay3 doubleValue] target:self selector:@selector(rotateIntroPict:) userInfo:nil repeats:NO];
+			introPictTimer = [NSTimer scheduledTimerWithTimeInterval:introDelay3 target:self selector:@selector(rotateIntroPict:) userInfo:nil repeats:NO];
 			// set next picture
-			[introImageView setImage:[[[NSImage alloc] initWithData:[(id <ResKnifeResourceProtocol>)[NSClassFromString(@"Resource") getResourceOfType:[plugBundle localizedStringForKey:@"PICT" value:@"" table:@"Resource Types"] andID:introPict3 inDocument:nil] data]] autorelease]];
+			[introImageView setImage:[[NSImage alloc] initWithData:[(id <ResKnifeResource>)[NSClassFromString(@"Resource") getResourceOfType:'PICT' andID:introPict3 inDocument:nil] data]]];
 			break;
 	
 		case 4:
 			// install new timer
-			introPictTimer = [NSTimer scheduledTimerWithTimeInterval:(NSTimeInterval)[introDelay4 doubleValue] target:self selector:@selector(rotateIntroPict:) userInfo:nil repeats:NO];
+			introPictTimer = [NSTimer scheduledTimerWithTimeInterval:introDelay4 target:self selector:@selector(rotateIntroPict:) userInfo:nil repeats:NO];
 			// set next picture
-			[introImageView setImage:[[[NSImage alloc] initWithData:[(id <ResKnifeResourceProtocol>)[NSClassFromString(@"Resource") getResourceOfType:[plugBundle localizedStringForKey:@"PICT" value:@"" table:@"Resource Types"] andID:introPict4 inDocument:nil] data]] autorelease]];
+			[introImageView setImage:[[NSImage alloc] initWithData:[(id <ResKnifeResource>)[NSClassFromString(@"Resource") getResourceOfType:'PICT' andID:introPict4 inDocument:nil] data]]];
 			break;
 	
 	}
@@ -322,24 +384,24 @@
 	/* ship, cash, kills */
 	if( sender == shipField && [sender stringValue] )
 	{
-		id old = ship;
-		ship = [[DataSource resIDFromStringValue:[sender stringValue]] retain];
-		if( ![ship isEqualToNumber:old] ) [resource touch];
-		[old release];
+		short old = ship;
+		ship = [DataSource resIDFromStringValue:[sender stringValue]];
+		if (ship != old)
+			[self.resource touch];
 	}
 	else if( sender == cashField )
 	{
-		id old = cash;
-		cash = [[NSNumber alloc] initWithInt:[sender intValue]];
-		if( ![cash isEqualToNumber:old] ) [resource touch];
-		[old release];
+		int old = cash;
+		cash = [sender intValue];
+		if (cash != old)
+			[self.resource touch];
 	}
 	else if( sender == killsField )
 	{
-		id old = kills;
-		kills = [[NSNumber alloc] initWithInt:[sender intValue]];
-		if( ![kills isEqualToNumber:old] ) [resource touch];
-		[old release];
+		short old = kills;
+		kills = (short)[sender intValue];
+		if (kills != old)
+			[self.resource touch];
 	}
 	
 	/* start date */
@@ -347,213 +409,205 @@
 	{
 		id old = date;
 		date = [[NSCalendarDate alloc] initWithYear:[old yearOfCommonEra] month:[old monthOfYear] day:[sender intValue] hour:0 minute:0 second:0 timeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];;
-		if( ![date isEqualToDate:old] ) [resource touch];
-		[old release];
+		if( ![date isEqualToDate:old] ) [self.resource touch];
 	}
 	else if( sender == monthField || sender == monthStepper )
 	{
 		id old = date;
 		date = [[NSCalendarDate alloc] initWithYear:[old yearOfCommonEra] month:[sender intValue] day:[old dayOfMonth] hour:0 minute:0 second:0 timeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];;
-		if( ![date isEqualToDate:old] ) [resource touch];
-		[old release];
+		if( ![date isEqualToDate:old] ) [self.resource touch];
 	}
 	else if( sender == yearField || sender == yearStepper )
 	{
 		id old = date;
 		date = [[NSCalendarDate alloc] initWithYear:[sender intValue] month:[old monthOfYear] day:[old dayOfMonth] hour:0 minute:0 second:0 timeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];;
-		if( ![date isEqualToDate:old] ) [resource touch];
-		[old release];
+		if( ![date isEqualToDate:old] ) [self.resource touch];
 	}
 	else if( sender == prefixField && [sender stringValue] )
 	{
 		id old = prefix;
-		prefix = [[sender stringValue] retain];
-		if( ![prefix isEqualToString:old] ) [resource touch];
-		[old release];
+		prefix = [sender stringValue];
+		if( ![prefix isEqualToString:old] ) [self.resource touch];
 	}
 	else if( sender == suffixField && [sender stringValue] )
 	{
 		id old = suffix;
-		suffix = [[sender stringValue] retain];
-		if( ![suffix isEqualToString:old] ) [resource touch];
-		[old release];
+		suffix = [sender stringValue];
+		if( ![suffix isEqualToString:old] ) [self.resource touch];
 	}
 	
 	/* planet combo boxes */
 	else if( sender == startField1 && [sender stringValue] )
 	{
-		id old = start1;
-		start1 = [[DataSource resIDFromStringValue:[sender stringValue]] retain];
-		if( ![start1 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		short old = start1;
+		start1 = [DataSource resIDFromStringValue:[sender stringValue]];
+		if (start1 !=old)
+			[self.resource touch];
 	}
 	else if( sender == startField2 && [sender stringValue] )
 	{
-		id old = start2;
-		start2 = [[DataSource resIDFromStringValue:[sender stringValue]] retain];
-		if( ![start2 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		short old = start2;
+		start2 = [DataSource resIDFromStringValue:[sender stringValue]];
+		if (start2 != old)
+			[self.resource touch];
 	}
 	else if( sender == startField3 && [sender stringValue] )
 	{
-		id old = start3;
-		start3 = [[DataSource resIDFromStringValue:[sender stringValue]] retain];
-		if( ![start3 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		short old = start3;
+		start3 = [DataSource resIDFromStringValue:[sender stringValue]];
+		if (start3 != old)
+			[self.resource touch];
 	}
 	else if( sender == startField4 && [sender stringValue] )
 	{
-		id old = start4;
-		start4 = [[DataSource resIDFromStringValue:[sender stringValue]] retain];
-		if( ![start4 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		short old = start4;
+		start4 = [DataSource resIDFromStringValue:[sender stringValue]];
+		if (start4 != old)
+			[self.resource touch];
 	}
 
 	/* starting government status */
 	else if( sender == statusField1 )
 	{
-		id old = status1;
-		status1 = [[NSNumber alloc] initWithInt:[sender intValue]];
-		if( ![status1 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		short old = status1;
+		status1 = (short)[sender intValue];
+		if (status1 != old)
+			[self.resource touch];
 	}
 	else if( sender == statusField2 )
 	{
-		id old = status2;
-		status2 = [[NSNumber alloc] initWithInt:[sender intValue]];
-		if( ![status2 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		short old = status2;
+		status2 = (short)([sender intValue]);
+		if (status2 != old)
+			[self.resource touch];
 	}
 	else if( sender == statusField3 )
 	{
-		id old = status3;
-		status3 = [[NSNumber alloc] initWithInt:[sender intValue]];
-		if( ![status3 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		short old = status3;
+		status3 = (short)([sender intValue]);
+		if (status3 != old)
+			[self.resource touch];
 	}
 	else if( sender == statusField4 )
 	{
-		id old = status4;
-		status4 = [[NSNumber alloc] initWithInt:[sender intValue]];
-		if( ![status4 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		short old = status4;
+		status4 = (short)([sender intValue]);
+		if (status4 != old)
+			[self.resource touch];
 	}
 	
 	/* government combo boxes */
 	else if( sender == governmentField1 && [sender stringValue] )
 	{
-		id old = government1;
-		government1 = [[DataSource resIDFromStringValue:[sender stringValue]] retain];
-		if( ![government1 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		short old = government1;
+		government1 = [DataSource resIDFromStringValue:[sender stringValue]];
+		if (government1 != old)
+			[self.resource touch];
 	}
 	else if( sender == governmentField2 && [sender stringValue] )
 	{
-		id old = government2;
-		government2 = [[DataSource resIDFromStringValue:[sender stringValue]] retain];
-		if( ![government2 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		short old = government2;
+		government2 = [DataSource resIDFromStringValue:[sender stringValue]];
+		if (government2 != old)
+			[self.resource touch];
 	}
 	else if( sender == governmentField3 && [sender stringValue] )
 	{
-		id old = government3;
-		government3 = [[DataSource resIDFromStringValue:[sender stringValue]] retain];
-		if( ![government3 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		short old = government3;
+		government3 = [DataSource resIDFromStringValue:[sender stringValue]];
+		if (government3 != old)
+			[self.resource touch];
 	}
 	else if( sender == governmentField4 && [sender stringValue] )
 	{
-		id old = government4;
-		government4 = [[DataSource resIDFromStringValue:[sender stringValue]] retain];
-		if( ![government4 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		short old = government4;
+		government4 = [DataSource resIDFromStringValue:[sender stringValue]];
+		if (government4 != old)
+			[self.resource touch];
 	}
 	
 	/* intro text combo box */
 	else if( sender == introTextField && [sender stringValue] )
 	{
-		id old = introText;
-		introText = [[DataSource resIDFromStringValue:[sender stringValue]] retain];
-		if( ![introText isEqualToNumber:old] )
-		{
-			[resource touch];
+		short old = introText;
+		introText = [DataSource resIDFromStringValue:[sender stringValue]];
+		if (introText != old) {
+			[self.resource touch];
 			[self update];		// to draw text in text box
 		}
-		[old release];
 	}
 	
 	/* intro picture combo boxes */
 	else if( sender == introPictField1 && [sender stringValue] )
 	{
-		id old = introPict1;
-		introPict1 = [[DataSource resIDFromStringValue:[sender stringValue]] retain];
-		if( ![introPict1 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		short old = introPict1;
+		introPict1 = [DataSource resIDFromStringValue:[sender stringValue]];
+		if (introPict1 != old)
+			[self.resource touch];
 	}
 	else if( sender == introPictField2 && [sender stringValue] )
 	{
-		id old = introPict2;
-		introPict2 = [[DataSource resIDFromStringValue:[sender stringValue]] retain];
-		if( ![introPict2 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		short old = introPict2;
+		introPict2 = [DataSource resIDFromStringValue:[sender stringValue]];
+		if (introPict2 != old)
+			[self.resource touch];
 	}
 	else if( sender == introPictField3 && [sender stringValue] )
 	{
-		id old = introPict3;
-		introPict3 = [[DataSource resIDFromStringValue:[sender stringValue]] retain];
-		if( ![introPict3 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		short old = introPict3;
+		introPict3 = [DataSource resIDFromStringValue:[sender stringValue]];
+		if (introPict3 != old)
+			[self.resource touch];
 	}
 	else if( sender == introPictField4 && [sender stringValue] )
 	{
-		id old = introPict4;
-		introPict4 = [[DataSource resIDFromStringValue:[sender stringValue]] retain];
-		if( ![introPict4 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		short old = introPict4;
+		introPict4 = [DataSource resIDFromStringValue:[sender stringValue]];
+		if (introPict4 != old)
+			[self.resource touch];
 	}
 	
 	/* intro picture delays */
 	else if( sender == introDelayField1 )
 	{
-		id old = introDelay1;
-		introDelay1 = [[NSNumber alloc] initWithInt:[sender intValue]];
-		if( ![introDelay1 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		int old = introDelay1;
+		introDelay1 = (short)[sender intValue];
+		if (introDelay1 != old)
+			[self.resource touch];
 	}
 	else if( sender == introDelayField2 )
 	{
-		id old = introDelay2;
-		introDelay2 = [[NSNumber alloc] initWithInt:[sender intValue]];
-		if( ![introDelay2 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		int old = introDelay2;
+		introDelay2 = (short)[sender intValue];
+		if (introDelay2 != old)
+			[self.resource touch];
 	}
 	else if( sender == introDelayField3 )
 	{
-		id old = introDelay3;
-		introDelay3 = [[NSNumber alloc] initWithInt:[sender intValue]];
-		if( ![introDelay3 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		int old = introDelay3;
+		introDelay3 = (short)[sender intValue];
+		if (introDelay3 != old)
+			[self.resource touch];
 	}
 	else if( sender == introDelayField4 )
 	{
-		id old = introDelay4;
-		introDelay4 = [[NSNumber alloc] initWithInt:[sender intValue]];
-		if( ![introDelay4 isEqualToNumber:old] ) [resource touch];
-		[old release];
+		int old = introDelay4;
+		introDelay4 = (short)[sender intValue];
+		if (introDelay4 != old)
+			[self.resource touch];
 	}
 	
 	/* on start field */
 	else if( sender == onStartField && [sender stringValue] )
 	{
 		id old = onStart;
-		onStart = [[sender stringValue] retain];
-		if( ![onStart isEqualToString:old] ) [resource touch];
-		[old release];
+		onStart = [sender stringValue];
+		if( ![onStart isEqualToString:old] ) [self.resource touch];
 	}
 	
 	// hack to simply & easily parse combo boxes
 	[self comboBoxWillPopUp:notification];
-	[self setDocumentEdited:[resource isDirty]];
+	[self setDocumentEdited:[self.resource isDirty]];
 }
 
 - (NSDictionary *)validateValues
@@ -563,53 +617,53 @@
 	// put current values into boomRec
 	charRec->Flags = 0x0000;
 	charRec->Flags |= principalChar? 0x0001:0;
-	charRec->startShipType = [ship shortValue];
-	charRec->startCash = [cash longValue];
-	charRec->startKills = [kills shortValue];
-	charRec->startDay = [date dayOfMonth];
-	charRec->startMonth = [date monthOfYear];
-	charRec->startYear = [date yearOfCommonEra];
-	BlockZero( charRec->Prefix, 16 );
-	BlockMoveData( [prefix cString], charRec->Prefix, [prefix cStringLength] <= 15? [prefix cStringLength]+1:16 );
-	BlockZero( charRec->Suffix, 16 );
-	BlockMoveData( [suffix cString], charRec->Suffix, [suffix cStringLength] <= 15? [suffix cStringLength]+1:16 );
-	charRec->startSystem[0] = [start1 shortValue];
-	charRec->startSystem[1] = [start2 shortValue];
-	charRec->startSystem[2] = [start3 shortValue];
-	charRec->startSystem[3] = [start4 shortValue];
-	charRec->startGovt[0] = [government1 shortValue];
-	charRec->startGovt[1] = [government2 shortValue];
-	charRec->startGovt[2] = [government3 shortValue];
-	charRec->startGovt[3] = [government4 shortValue];
-	charRec->startStatus[0] = [status1 shortValue];
-	charRec->startStatus[1] = [status2 shortValue];
-	charRec->startStatus[2] = [status3 shortValue];
-	charRec->startStatus[3] = [status4 shortValue];
-	charRec->introTextID = [introText shortValue];
-	charRec->introPictID[0] = [introPict1 shortValue];
-	charRec->introPictID[1] = [introPict2 shortValue];
-	charRec->introPictID[2] = [introPict3 shortValue];
-	charRec->introPictID[3] = [introPict4 shortValue];
-	charRec->introPictDelay[0] = [introDelay1 shortValue];
-	charRec->introPictDelay[1] = [introDelay2 shortValue];
-	charRec->introPictDelay[2] = [introDelay3 shortValue];
-	charRec->introPictDelay[3] = [introDelay4 shortValue];
-	BlockZero( charRec->OnStart, 256 );
-	BlockMoveData( [onStart cString], charRec->OnStart, [onStart cStringLength] <= 255? [onStart cStringLength]+1:256 );
-	BlockZero( charRec->UnusedA, 8*sizeof(short) );
+	charRec->startShipType = ship;
+	charRec->startCash = cash;
+	charRec->startKills = kills;
+	charRec->startDay = (short)[date dayOfMonth];
+	charRec->startMonth = (short)[date monthOfYear];
+	charRec->startYear = (short)[date yearOfCommonEra];
+	bzero( charRec->Prefix, 16 );
+	memmove( charRec->Prefix, [prefix cStringUsingEncoding:NSMacOSRomanStringEncoding], [prefix lengthOfBytesUsingEncoding:NSMacOSRomanStringEncoding] <= 15? [prefix lengthOfBytesUsingEncoding:NSMacOSRomanStringEncoding]+1:16 );
+	bzero( charRec->Suffix, 16 );
+	memmove( charRec->Suffix, [suffix cStringUsingEncoding:NSMacOSRomanStringEncoding], [suffix lengthOfBytesUsingEncoding:NSMacOSRomanStringEncoding] <= 15? [suffix lengthOfBytesUsingEncoding:NSMacOSRomanStringEncoding]+1:16 );
+	charRec->startSystem[0] = start1;
+	charRec->startSystem[1] = start2;
+	charRec->startSystem[2] = start3;
+	charRec->startSystem[3] = start4;
+	charRec->startGovt[0] = government1;
+	charRec->startGovt[1] = government2;
+	charRec->startGovt[2] = government3;
+	charRec->startGovt[3] = government4;
+	charRec->startStatus[0] = status1;
+	charRec->startStatus[1] = status2;
+	charRec->startStatus[2] = status3;
+	charRec->startStatus[3] = status4;
+	charRec->introTextID = introText;
+	charRec->introPictID[0] = introPict1;
+	charRec->introPictID[1] = introPict2;
+	charRec->introPictID[2] = introPict3;
+	charRec->introPictID[3] = introPict4;
+	charRec->introPictDelay[0] = introDelay1;
+	charRec->introPictDelay[1] = introDelay2;
+	charRec->introPictDelay[2] = introDelay3;
+	charRec->introPictDelay[3] = introDelay4;
+	bzero( charRec->OnStart, 256 );
+	memmove( charRec->OnStart, [onStart cStringUsingEncoding:NSMacOSRomanStringEncoding], [onStart lengthOfBytesUsingEncoding:NSMacOSRomanStringEncoding] <= 255? [onStart lengthOfBytesUsingEncoding:NSMacOSRomanStringEncoding]+1:256 );
+	bzero( charRec->UnusedA, 8*sizeof(short) );
 	
 	// verify values are valid
 	if(charRec->startDay < 1 || charRec->startDay > 31 )
-		[errorValues setObject:@"must be between 1 and 31." forKey:@"Start Day"];
+		errorValues[@"Start Day"] = @"must be between 1 and 31.";
 	if( charRec->startMonth < 1 || charRec->startMonth > 12 )
-		[errorValues setObject:@"must be between 1 and 12." forKey:@"Start Month"];
+		errorValues[@"Start Month"] = @"must be between 1 and 12.";
 	if( charRec->startYear < 1 )
-		[errorValues setObject:@"must be above zero." forKey:@"Start Year"];
+		errorValues[@"Start Year"] = @"must be above zero.";
 	if(((charRec->introPictDelay[0] < 1 || charRec->introPictDelay[0] > 300) && (charRec->introPictDelay[0] != -1))
 	|| ((charRec->introPictDelay[1] < 1 || charRec->introPictDelay[1] > 300) && (charRec->introPictDelay[1] != -1))
 	|| ((charRec->introPictDelay[2] < 1 || charRec->introPictDelay[2] > 300) && (charRec->introPictDelay[2] != -1))
 	|| ((charRec->introPictDelay[3] < 1 || charRec->introPictDelay[3] > 300) && (charRec->introPictDelay[3] != -1)))
-		[errorValues setObject:@"valid delays are 1 to 300 seconds, or -1 for unused values." forKey:@"Intro Picture Delays"];
+		errorValues[@"Intro Picture Delays"] = @"valid delays are 1 to 300 seconds, or -1 for unused values.";
 	
 	// all values fell within acceptable range
 	return errorValues;
@@ -618,7 +672,9 @@
 - (void)saveResource
 {
 	// save new data into resource structure (should have already been validated, and charRec filled out correctly)
-	[resource setData:[NSData dataWithBytes:charRec length:sizeof(CharRec)]];
+	NSMutableData *saveData = [NSMutableData dataWithBytes:charRec length:sizeof(CharRec)];
+	BSwapCharRec([saveData mutableBytes]);
+	[self.resource setData:saveData];
 }
 
 @end

@@ -11,7 +11,7 @@
 */
 @class OpenPanelDelegate;
 
-@interface ApplicationDelegate : NSObject
+@interface ApplicationDelegate : NSObject <NSApplicationDelegate>
 {
 /*!	@var openPanelDelegate		Delegate for <tt>NSOpenPanels</tt>. */
 	IBOutlet OpenPanelDelegate  *openPanelDelegate;
@@ -61,12 +61,6 @@
 */
 - (IBAction)showPrefs:(id)sender;
 
-/*!
-@method			initUserDefaults
-@abstract		Initalises any unset user preferences to default values as read in from <b>defaults.plist</b>.
-*/
-- (void)initUserDefaults;
-
 /* accessors */
 
 /*!
@@ -79,7 +73,7 @@
 @@method		iconForResourceType:
 @abstract		Returns the icon to be used throughout the UI for any given resource type.
 */
-- (NSImage *)iconForResourceType:(NSString *)resourceType;
+- (NSImage *)iconForResourceType:(OSType)resourceType;
 
 /*!
 @@method		_icons

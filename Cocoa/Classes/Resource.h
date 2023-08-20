@@ -8,7 +8,7 @@
 @description	The Resource class fully complies with key-value coding, with the keys @"name", @"type", @"resID", @"attributes", @"data", @"dirty" and @"representedFork" available.
 */
 
-@interface Resource : NSObject <NSCopying, NSCoding, ResKnifeResourceProtocol>
+@interface Resource : NSObject <NSCopying, NSCoding, ResKnifeResource>
 {
 @private
 	// flags
@@ -17,32 +17,33 @@
 	
 	// resource information
 	NSString		*name;
-	NSString		*type;
-	NSNumber		*resID;			// signed short
-	NSNumber		*attributes;	// unsigned short
+	OSType			type;
+	ResID			resID;			// signed short
+	RKResAttribute	attributes;		// unsigned short
 	
 	// the actual data
 	NSData			*data;
-	
-	// the document name for display to the user; updating this is the responsibility of the document itself
-	NSString		*_docName;
 }
 
 // accessor methods not part of the protocol
+@property (getter = isDirty) BOOL dirty;
+@property (copy) NSString *representedFork;
+	// the document name for display to the user; updating this is the responsibility of the document itself
+@property (copy) NSString* documentName;
 - (void)_setName:(NSString *)newName;
-- (void)setDirty:(BOOL)newValue;
-- (NSString *)representedFork;
-- (void)setRepresentedFork:(NSString *)forkName;
-- (void)setDocumentName:(NSString *)docName;
 
 // init methods
-- (id)initWithType:(NSString *)typeValue andID:(NSNumber *)resIDValue;
-- (id)initWithType:(NSString *)typeValue andID:(NSNumber *)resIDValue withName:(NSString *)nameValue andAttributes:(NSNumber *)attributesValue;
-- (id)initWithType:(NSString *)typeValue andID:(NSNumber *)resIDValue withName:(NSString *)nameValue andAttributes:(NSNumber *)attributesValue data:(NSData *)dataValue;
+- (instancetype)initWithType:(OSType)typeValue andID:(short)resIDValue;
+- (instancetype)initWithType:(OSType)typeValue andID:(short)resIDValue withName:(NSString *)nameValue andAttributes:(UInt16)attributesValue;
+- (instancetype)initWithType:(OSType)typeValue andID:(short)resIDValue withName:(NSString *)nameValue andAttributes:(UInt16)attributesValue data:(NSData *)dataValue;
 
 // autoreleased resource methods
-+ (id)resourceOfType:(NSString *)typeValue andID:(NSNumber *)resIDValue;
-+ (id)resourceOfType:(NSString *)typeValue andID:(NSNumber *)resIDValue withName:(NSString *)nameValue andAttributes:(NSNumber *)attributesValue;
-+ (id)resourceOfType:(NSString *)typeValue andID:(NSNumber *)resIDValue withName:(NSString *)nameValue andAttributes:(NSNumber *)attributesValue data:(NSData *)dataValue;
++ (instancetype)resourceOfType:(OSType)typeValue andID:(short)resIDValue;
++ (instancetype)resourceOfType:(OSType)typeValue andID:(short)resIDValue withName:(NSString *)nameValue andAttributes:(UInt16)attributesValue;
++ (instancetype)resourceOfType:(OSType)typeValue andID:(short)resIDValue withName:(NSString *)nameValue andAttributes:(UInt16)attributesValue data:(NSData *)dataValue;
+
++ (instancetype)resourceOfType:(OSType)typeValue withName:(NSString *)nameValue inDocument:(NSDocument *)searchDocument;
+
++ (Resource *)getResourceOfType:(OSType)typeValue andID:(short)resIDValue inDocument:(NSDocument *)searchDoc;
 
 @end

@@ -5,10 +5,9 @@ extern NSString *RKResourcePboardType;
 
 @implementation PasteboardDocument
 
-- (id)init
+- (instancetype)init
 {
-	self = [super init];
-	if( self )
+	if (self = [super init])
 	{
 		[self readPasteboard:NSGeneralPboard];
 	}
@@ -23,11 +22,11 @@ extern NSString *RKResourcePboardType;
 	NSString *pbType;
 	
 	// clear current pasteboard representation
-	[self selectAll:nil];
+	//[self selectAll:nil];
 	[self clear:nil];
 	
 	// set the window's title to represent the pasteboard being shown (at some point I anticipate having several of these)
-	[[self window] setTitle:pbName];
+	[[self mainWindow] setTitle:pbName];
 	
 	// disable undos during loading
 	[[self undoManager] disableUndoRegistration];
@@ -41,7 +40,7 @@ extern NSString *RKResourcePboardType;
 		else
 		{
 			// create the faux resource & add it to the array
-			Resource *resource = [Resource resourceOfType:nil andID:nil withName:pbType andAttributes:nil data:[pb dataForType:pbType]];
+			Resource *resource = [Resource resourceOfType:0 andID:0 withName:pbType andAttributes:0 data:[pb dataForType:pbType]];
 			[resources addObject:resource];		// array retains resource
 		}
 	}

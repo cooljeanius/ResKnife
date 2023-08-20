@@ -15,17 +15,29 @@
 
 @implementation ApplicationDelegate
 
-- (id)init
++ (void)initialize
 {
-	self = [super init];
-	[NSApp registerServicesMenuSendTypes:[NSArray arrayWithObject:NSStringPboardType] returnTypes:[NSArray arrayWithObject:NSStringPboardType]];
+	// set default preferences
+	NSDictionary * prefDict = @{kPreserveBackups: @YES,
+								kAutosave: @NO,
+								kAutosaveInterval: @5,
+								kDeleteResourceWarning: @YES,
+								kLaunchAction: kOpenUntitledFile};
+	[[NSUserDefaults standardUserDefaults] registerDefaults:prefDict];
+}
+
+- (instancetype)init
+{
+	if (self = [super init]) {
+		[NSApp registerServicesMenuSendTypes:@[NSStringPboardType] returnTypes:@[NSStringPboardType]];
+	}
 	return self;
 }
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification
 {
 	// instanciate my own subclass of NSDocumentController so I can override the open dialog
-	[[RKDocumentController alloc] init];
+	// autorelease to fix an analyzer warning; the application already holds onto the document controller
 	[RKSupportResourceRegistry scanForSupportResources];
 }
 
@@ -37,22 +49,14 @@
 - (void)awakeFromNib
 {
 	// Part of my EvilPlanª to find out how many people use ResKnife and how often!
-	int launchCount = [[NSUserDefaults standardUserDefaults] integerForKey:@"LaunchCount"];
+	NSInteger launchCount = [[NSUserDefaults standardUserDefaults] integerForKey:@"LaunchCount"];
 	[[NSUserDefaults standardUserDefaults] setInteger:launchCount + 1 forKey:@"LaunchCount"];
 	
 	// initalise an empty icon cache and create timer used to pre-cache a number of common icons
 	_icons = [[NSMutableDictionary alloc] init];
 	[NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(precacheIcons:) userInfo:nil repeats:NO];
-	
-	// set default preferences
-    [self initUserDefaults];
 }
 
-- (void)dealloc
-{
-	[_icons release];
-	[super dealloc];
-}
 
 /*!
 @method			precacheIcons:
@@ -65,14 +69,14 @@
 - (void)precacheIcons:(NSTimer *)timer
 {
 	// pre-cache a number of common icons (ignores return value, relies on iconForResourceType: to do the actual caching)
-	[self iconForResourceType:@"    "];
-	[self iconForResourceType:@"????"];
-	[self iconForResourceType:@"CODE"];
-	[self iconForResourceType:@"icns"];
-	[self iconForResourceType:@"PICT"];
-	[self iconForResourceType:@"plst"];
-	[self iconForResourceType:@"snd "];
-	[self iconForResourceType:@"TEXT"];
+	[self iconForResourceType:'    '];
+	[self iconForResourceType:0x3f3f3f3f];
+	[self iconForResourceType:'CODE'];
+	[self iconForResourceType:'icns'];
+	[self iconForResourceType:'PICT'];
+	[self iconForResourceType:'plst'];
+	[self iconForResourceType:'snd '];
+	[self iconForResourceType:'TEXT'];
 }
 
 - (NSArray *)forksForFile:(FSRef *)fileRef
@@ -99,9 +103,7 @@
 			if(!error)
 			{
 				NSString *fName = [NSString stringWithCharacters:forkName.unicode length:forkName.length];
-				NSNumber *fSize = [NSNumber numberWithLongLong:forkSize];
-				NSNumber *fAlloc = [NSNumber numberWithUnsignedLongLong:forkPhysicalSize];
-				[forks addObject:[NSDictionary dictionaryWithObjectsAndKeys:fName, @"forkname", fSize, @"forksize", fAlloc, @"forkallocation", nil]];
+				[forks addObject:@{@"forkname": fName, @"forksize": @(forkSize), @"forkallocation": @(forkPhysicalSize)}];
 			}
 			else if(error != errFSNoMoreItems)
 			{
@@ -119,10 +121,10 @@
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender
 {
 #pragma unused(sender)
-	NSString *launchAction = [[NSUserDefaults standardUserDefaults] stringForKey:@"LaunchAction"];
-	if([launchAction isEqualToString:@"OpenUntitledFile"])
+	NSString *launchAction = [[NSUserDefaults standardUserDefaults] stringForKey:kLaunchAction];
+	if([launchAction isEqualToString:kOpenUntitledFile])
 		return YES;
-	else if([launchAction isEqualToString:@"DisplayOpenPanel"])
+	else if([launchAction isEqualToString:kDisplayOpenPanel])
 	{
 		[[NSDocumentController sharedDocumentController] openDocument:sender];
 		return NO;
@@ -186,43 +188,6 @@
 	[[PrefsWindowController sharedPrefsWindowController] showWindow:sender];
 }
 
-- (void)initUserDefaults
-{
-	// This should probably be added to NSUserDefaults as a category,
-	//	since its universally useful.  It loads a defaults.plist file
-	//	from the app wrapper, and then sets the defaults if they don't
-	//	already exist.
-	
-	NSUserDefaults *defaults;
-	NSDictionary *defaultsPlist;
-	NSEnumerator *overDefaults;
-	id eachDefault;
-	
-	// this isn't required, but saves us a few method calls
-	defaults = [NSUserDefaults standardUserDefaults];
-	
-	// load the defaults.plist from the app wrapper.  This makes it
-	//	easy to add new defaults just using a text editor instead of
-	//	hard-coding them into the application
-	defaultsPlist = [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"]];
-	
-	// enumerate over all the keys in the dictionary
-	overDefaults = [[defaultsPlist allKeys] objectEnumerator];
-	while(eachDefault = [overDefaults nextObject])
-	{
-		// for each key in the dictionary
-		//	check if there is a value already registered for it
-		//	and if there isn't, then register the value that was in the file
-		if(![defaults stringForKey:eachDefault])
-		{
-			[defaults setObject:[defaultsPlist objectForKey:eachDefault] forKey:eachDefault];
-		}
-	}
-	
-	// force the defaults to save to the disk
-	[defaults synchronize];
-}
-
 - (OpenPanelDelegate *)openPanelDelegate
 {
 	return openPanelDelegate;
@@ -237,50 +202,48 @@
 @pending		I don't like the name I chose here for the resource type icons directory. Can anyone think of something better?
 */
 
-- (NSImage *)iconForResourceType:(NSString *)resourceType
+- (NSImage *)iconForResourceType:(OSType)resourceType
 {
-	NSImage *icon = nil;
-	if([resourceType isEqualToString:@""])
-		resourceType = nil;
+	NSImage *icon;
 	
 	if(resourceType)
 	{
 		// check if we have image in cache already
-		icon = [[self _icons] objectForKey:resourceType];		// valueForKey: raises when the resourceType begins with '@' (e.g. the @GN4 owner resource from Gene!)
+		icon = [self _icons][GetNSStringFromOSType(resourceType)];		// valueForKey: raises when the resourceType begins with '@' (e.g. the @GN4 owner resource from Gene!)
 		
 		if(!icon)
 		{
 			NSString *iconPath = nil;
 			
 			// try to load icon from the default editor for that type
-			Class editor = [[RKEditorRegistry defaultRegistry] editorForType:resourceType];
+			Class editor = [[RKEditorRegistry defaultRegistry] editorForType:GetNSStringFromOSType(resourceType)];
 			if(editor)
 			{
 				// ask politly for icon
 				if([editor respondsToSelector:@selector(iconForResourceType:)])
-					icon = [editor iconForResourceType:resourceType];
+					icon = [(id)editor iconForResourceType:resourceType];
 				
 				// try getting it myself
 				if(!icon)
 				{
-					iconPath = [[NSBundle bundleForClass:editor] pathForResource:resourceType ofType:nil inDirectory:@"Resource Type Icons"];
+					iconPath = [[NSBundle bundleForClass:editor] pathForResource:GetNSStringFromOSType(resourceType) ofType:nil inDirectory:@"Resource Type Icons"];
 					if(iconPath)
-						icon = [[[NSImage alloc] initWithContentsOfFile:iconPath] autorelease];
+						icon = [[NSImage alloc] initWithContentsOfFile:iconPath];
 				}
 			}
 			
 			// try to load icon from the ResKnife app bundle itself
 			if(!icon)
 			{
-				iconPath = [[NSBundle mainBundle] pathForResource:resourceType ofType:nil inDirectory:@"Resource Type Icons"];
+				iconPath = [[NSBundle mainBundle] pathForResource:GetNSStringFromOSType(resourceType) ofType:nil inDirectory:@"Resource Type Icons"];
 				if(iconPath)
-					icon = [[[NSImage alloc] initWithContentsOfFile:iconPath] autorelease];
+					icon = [[NSImage alloc] initWithContentsOfFile:iconPath];
 			}
 			
 			// try to retrieve from file system using our resource type to file name extension/bundle identifier code
 			if(!icon)
 			{
-				NSString *fileType = [[NSBundle mainBundle] localizedStringForKey:resourceType value:@"" table:@"Resource Type Mappings"];
+				NSString *fileType = [[NSBundle mainBundle] localizedStringForKey:GetNSStringFromOSType(resourceType) value:@"" table:@"Resource Type Mappings"];
 				NSRange range = [fileType rangeOfString:@"."];
 				if(range.location == NSNotFound)
 					icon = [[NSWorkspace sharedWorkspace] iconForFileType:fileType];
@@ -296,11 +259,11 @@
 			
 			// try to retrieve from file system as an OSType code
 			if(!icon)
-				icon = [[NSWorkspace sharedWorkspace] iconForFileType:[NSString stringWithFormat:@"'%@'", resourceType]];
+				icon = [[NSWorkspace sharedWorkspace] iconForFileType:[NSString stringWithFormat:@"'%@'", GetNSStringFromOSType(resourceType)]];
 			
 			// save the newly retrieved icon in the cache
 			if(icon)
-				[[self _icons] setObject:icon forKey:resourceType];
+				[self _icons][GetNSStringFromOSType(resourceType)] = icon;
 		}
 	}
 	else

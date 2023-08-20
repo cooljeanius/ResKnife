@@ -1,6 +1,5 @@
 #import <Cocoa/Cocoa.h>
-#import "HexEditorDelegate.h"
-#import "HexTextView.h"
+#import <HexFiend/HexFiend.h>
 
 #import "ResKnifePluginProtocol.h"
 #import "ResKnifeResourceProtocol.h"
@@ -17,32 +16,28 @@
 /* Based on HexEdit by Bill Bumgardner, Lane Roath & myself: http://hexedit.sourceforge.net/ */
 /* Some ideas, method names, and occasionally code stolen from HexEditor by Raphael Sebbe: http://raphaelsebbe.multimania.com/ */
 
-@interface HexWindowController : NSWindowController <ResKnifePluginProtocol>
+@class FindSheetController;
+
+@interface HexWindowController : NSWindowController <ResKnifePlugin>
 {
-	IBOutlet HexEditorDelegate	*hexDelegate;
-	IBOutlet NSTextView			*offset;		// these four should be phased out whenever possible
-	IBOutlet HexTextView		*hex;			// these four should be phased out whenever possible
-	IBOutlet AsciiTextView		*ascii;			// these four should be phased out whenever possible
-	IBOutlet NSTextField		*message;		// these four should be phased out whenever possible
-	IBOutlet NSMenu				*copySubmenu;
-	IBOutlet NSMenu				*pasteSubmenu;
+	FindSheetController			*sheetController;
 	
-	id <ResKnifeResourceProtocol>	resource;
-	id <ResKnifeResourceProtocol>	backup;
+	id <ResKnifeResource>	resource;
+	id <ResKnifeResource>	backup;
 	
 	BOOL			liveEdit;
-	int				bytesPerRow;
 	NSUndoManager   *undoManager;
 }
+@property (weak) IBOutlet HFTextView *textView;
 
-// conform to the ResKnifePluginProtocol with the inclusion of these methods
-- (id)initWithResource:(id)newResource;
+// conform to the ResKnifePlugin with the inclusion of these methods
+- (instancetype)initWithResource:(id)newResource;
 
 // show find sheet
 - (IBAction)showFind:(id)sender;
 
 // save sheet methods
-- (void)saveSheetDidClose:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
+- (void)saveSheetDidClose:(NSAlert *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo;
 - (IBAction)saveResource:(id)sender;
 - (IBAction)revertResource:(id)sender;
 
@@ -50,19 +45,9 @@
 - (void)resourceNameDidChange:(NSNotification *)notification;
 - (void)resourceDataDidChange:(NSNotification *)notification;
 - (void)resourceWasSaved:(NSNotification *)notification;
-- (void)refreshData:(NSData *)data;
 
 // accessors
 - (id)resource;
 - (NSData *)data;
-- (int)bytesPerRow;
-- (NSMenu *)copySubmenu;
-- (NSMenu *)pasteSubmenu;
-
-// bug: these should be functions not class member methods
-+ (NSRange)byteRangeFromHexRange:(NSRange)hexRange;
-+ (NSRange)hexRangeFromByteRange:(NSRange)byteRange;
-+ (NSRange)byteRangeFromAsciiRange:(NSRange)asciiRange;
-+ (NSRange)asciiRangeFromByteRange:(NSRange)byteRange;
 
 @end

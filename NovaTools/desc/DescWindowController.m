@@ -1,12 +1,18 @@
 #import "DescWindowController.h"
 
 @implementation DescWindowController
+@synthesize graphicsView;
 
-- (id)initWithResource:(id <ResKnifeResourceProtocol>)newResource
+- (instancetype)initWithResource:(id <ResKnifeResource>)newResource
 {
 	self = [self initWithWindowNibName:@"desc"];
 	if( !self ) return nil;
 	return self;
+}
+
+- (IBAction)chooseMovieFile:(id)sender
+{
+	
 }
 
 - (void)windowDidLoad

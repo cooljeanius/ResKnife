@@ -2,7 +2,7 @@
 
 @implementation PasteboardWindowController
 
-- (id)init
+- (instancetype)init
 {
 	self = [self initWithWindowNibName:@"ResourceDocument"];
 	if( self ) [self setWindowFrameAutosaveName:@"PasteboardWindow"];
@@ -11,10 +11,10 @@
 
 + (id)sharedPasteboardWindowController
 {
-	static PasteboardWindowController *sharedPasteboardWindowController = nil;
+	static PasteboardWindowController *sharedPasteboardWindowController;
 	if( !sharedPasteboardWindowController )
 	{
-		sharedPasteboardWindowController = [[PasteboardWindowController allocWithZone:[self zone]] init];
+		sharedPasteboardWindowController = [[PasteboardWindowController allocWithZone:nil] init];
 	}
 	return sharedPasteboardWindowController;
 }

@@ -2,10 +2,11 @@
 
 @implementation ShipWindowController
 
-- (id)initWithResource:(id <ResKnifeResourceProtocol>)newResource
+- (instancetype)initWithResource:(id <ResKnifeResource>)newResource
 {
-	self = [self initWithWindowNibName:@"ship"];
-	if( !self ) return nil;
+	if (self = [self initWithWindowNibName:@"ship"]) {
+		
+	}
 	return self;
 }
 

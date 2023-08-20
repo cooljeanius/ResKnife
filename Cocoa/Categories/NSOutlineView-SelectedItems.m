@@ -12,21 +12,11 @@
 
 - (NSArray *)selectedItems
 {
-	NSMutableArray *items = [NSMutableArray array];
-#if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_3
+	NSMutableArray *items = [NSMutableArray array];	
 	NSIndexSet *indicies = [self selectedRowIndexes];
-    unsigned int rowIndex = [indicies firstIndex];
-    while (rowIndex != NSNotFound)
-	{
-        [items addObject:[self itemAtRow:rowIndex]];
-        rowIndex = [indicies indexGreaterThanIndex:rowIndex];
-    }
-#else
-	NSNumber *row;
-	NSEnumerator *enumerator = [self selectedRowEnumerator];
-	while (row = [enumerator nextObject])
-		[items addObject:[self itemAtRow:[row intValue]]];
-#endif
+	[indicies enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
+		[items addObject:[self itemAtRow:idx]];
+	}];
 	
 	return items;
 }

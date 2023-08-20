@@ -1,13 +1,17 @@
 #import "Element.h"
 
 @implementation Element
+@synthesize type;
+@synthesize label;
+@synthesize isTMPL = _isTMPL;
+@synthesize parentArray;
 
 + (id)elementForType:(NSString *)t withLabel:(NSString *)l
 {
-	return [[[self alloc] autorelease] initForType:t withLabel:l];
+	return [[self alloc]initForType:t withLabel:l];
 }
 
-- (id)initForType:(NSString *)t withLabel:(NSString *)l
+- (instancetype)initForType:(NSString *)t withLabel:(NSString *)l
 {
 	self = [super init];
 	if(!self) return nil;
@@ -16,12 +20,6 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	[label release];
-	[type release];
-	[super dealloc];
-}
 
 - (id)copyWithZone:(NSZone *)zone
 {
@@ -32,60 +30,15 @@
 
 #pragma mark -
 
-- (void)setIsTMPL:(BOOL)t
-{
-	_isTMPL = t;
-}
-
-- (BOOL)isTMPL
-{
-	return _isTMPL;
-}
-
-- (void)setType:(NSString *)t
-{
-	id old = type;
-	type = [t copy];
-	[old release];
-}
-
-- (NSString *)type
-{
-	return type;
-}
-
-- (void)setLabel:(NSString *)l
-{
-	id old = label;
-	label = [l copy];
-	[old release];
-}
-
-- (NSString *)label
-{
-	return label;
-}
-
-- (void)setParentArray:(NSMutableArray *)array
-{
-	// do not retain parent object
-	parentArray = array;
-}
-
-- (NSMutableArray *)parentArray
-{
-	return parentArray;
-}
-
 /*** METHODS SUBCLASSES SHOULD OVERRIDE ***/
 
-- (int)subElementCount
+- (NSInteger)subElementCount
 {
 	// default implementation suitable for most element types
 	return 0;
 }
 
-- (Element *)subElementAtIndex:(int)n
+- (Element *)subElementAtIndex:(NSInteger)n
 {
 	// default implementation suitable for most element types
 	return nil;

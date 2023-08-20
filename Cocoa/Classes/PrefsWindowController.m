@@ -1,16 +1,24 @@
 #import "PrefsWindowController.h"
 
+NSString * const kPreserveBackups = @"PreserveBackups";
+NSString * const kAutosave = @"Autosave";
+NSString * const kAutosaveInterval = @"AutosaveInterval";
+NSString * const kDeleteResourceWarning =  @"DeleteResourceWarning";
+NSString * const kLaunchAction = @"LaunchAction";
+NSString * const kOpenUntitledFile = @"OpenUntitledFile";
+NSString * const kDisplayOpenPanel = @"DisplayOpenPanel";
+NSString * const kNoLaunchOption = @"None";
+
 @implementation PrefsWindowController
 
-- (id)init
+- (instancetype)init
 {
-	return [self initWithWindowNibName:@"PrefsWindow"];
+	return self = [self initWithWindowNibName:@"PrefsWindow"];
 }
 
 - (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[super dealloc];
 }
 
 - (void)awakeFromNib
@@ -27,18 +35,18 @@
 {
 	// load preferences…
 	NSUserDefaults *defaults	= [NSUserDefaults standardUserDefaults];
-	BOOL preserveBackups		= [defaults boolForKey:@"PreserveBackups"];
-	BOOL autosave				= [defaults boolForKey:@"Autosave"];
-	int autosaveInterval		= [defaults integerForKey:@"AutosaveInterval"];
-	BOOL deleteResourceWarning	= [defaults boolForKey:@"DeleteResourceWarning"];
-	BOOL createNewDocument		= [[defaults stringForKey:@"LaunchAction"] isEqualToString:@"OpenUntitledFile"];
-	BOOL displayOpenPanel		= [[defaults stringForKey:@"LaunchAction"] isEqualToString:@"DisplayOpenPanel"];
-	int launchAction			= createNewDocument? 1:(displayOpenPanel? 2:0);
+	BOOL preserveBackups		= [defaults boolForKey:kPreserveBackups];
+	BOOL autosave				= [defaults boolForKey:kAutosave];
+	NSInteger autosaveInterval	= [defaults integerForKey:kAutosaveInterval];
+	BOOL deleteResourceWarning	= [defaults boolForKey:kDeleteResourceWarning];
+	BOOL createNewDocument		= [[defaults stringForKey:kLaunchAction] isEqualToString:kOpenUntitledFile];
+	BOOL displayOpenPanel		= [[defaults stringForKey:kLaunchAction] isEqualToString:kDisplayOpenPanel];
+	int launchAction			= createNewDocument ? 1 : (displayOpenPanel ? 2 : 0);
 	
 	// …and set widgets accordingly
 	[[dataProtectionMatrix cellAtRow:preserveBackupsBox column:0] setState:preserveBackups];
 	[[dataProtectionMatrix cellAtRow:autosaveBox column:0] setState:autosave];
-	[autosaveIntervalField setStringValue:[NSString stringWithFormat:@"%d", autosaveInterval]];
+	[autosaveIntervalField setIntegerValue:autosaveInterval];
 	[[dataProtectionMatrix cellAtRow:deleteResourceWarningBox column:0] setState:deleteResourceWarning];
 	[launchActionMatrix selectCellAtRow:launchAction column:0];
 }
@@ -58,13 +66,13 @@
 	[[self window] orderOut:nil];
 	
 	// now save the data to the defaults file
-	[defaults setBool:preserveBackups forKey:@"PreserveBackups"];	// bug: this puts 1 or 0 into the defaults file rather than YES or NO
-	[defaults setBool:autosave forKey:@"Autosave"];
-	[defaults setInteger:autosaveInterval forKey:@"AutosaveInterval"];
-	[defaults setBool:deleteResourceWarning forKey:@"DeleteResourceWarning"];
-	if(createNewDocument)		[defaults setObject:@"OpenUntitledFile" forKey:@"LaunchAction"];
-	else if(displayOpenPanel)	[defaults setObject:@"DisplayOpenPanel" forKey:@"LaunchAction"];
-	else						[defaults setObject:@"None" forKey:@"LaunchAction"];
+	[defaults setBool:preserveBackups forKey:kPreserveBackups];	// bug: this puts 1 or 0 into the defaults file rather than YES or NO
+	[defaults setBool:autosave forKey:kAutosave];
+	[defaults setInteger:autosaveInterval forKey:kAutosaveInterval];
+	[defaults setBool:deleteResourceWarning forKey:kDeleteResourceWarning];
+	if(createNewDocument)		[defaults setObject:kOpenUntitledFile forKey:kLaunchAction];
+	else if(displayOpenPanel)	[defaults setObject:kDisplayOpenPanel forKey:kLaunchAction];
+	else						[defaults setObject:kNoLaunchOption forKey:kLaunchAction];
 	[defaults synchronize];
 }
 
@@ -81,12 +89,12 @@
 {
 	// reset prefs window widgets to values stored in defaults.plist file
 	NSDictionary *defaultsPlist	= [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"]];
-	BOOL preserveBackups		= [[defaultsPlist objectForKey:@"PreserveBackups"] intValue]? YES:NO;	// bug: this always evaluates to NO, even if the object in the dictionary is YES
-	BOOL autosave				= [[defaultsPlist objectForKey:@"Autosave"] intValue]? YES:NO;
-	int autosaveInterval		= [[defaultsPlist objectForKey:@"AutosaveInterval"] intValue];
-	BOOL deleteResourceWarning	= [[defaultsPlist objectForKey:@"DeleteResourceWarning"] intValue]? YES:NO;
-	BOOL createNewDocument		= [[defaultsPlist objectForKey:@"LaunchAction"] isEqualToString:@"OpenUntitledFile"];
-	BOOL displayOpenPanel		= [[defaultsPlist objectForKey:@"LaunchAction"] isEqualToString:@"DisplayOpenPanel"];
+	BOOL preserveBackups		= [defaultsPlist[kPreserveBackups] intValue]? YES:NO;	// bug: this always evaluates to NO, even if the object in the dictionary is YES
+	BOOL autosave				= [defaultsPlist[kAutosave] intValue]? YES:NO;
+	int autosaveInterval		= [defaultsPlist[kAutosaveInterval] intValue];
+	BOOL deleteResourceWarning	= [defaultsPlist[kDeleteResourceWarning] intValue]? YES:NO;
+	BOOL createNewDocument		= [defaultsPlist[kLaunchAction] isEqualToString:kOpenUntitledFile];
+	BOOL displayOpenPanel		= [defaultsPlist[kLaunchAction] isEqualToString:kDisplayOpenPanel];
 	int launchAction			= createNewDocument? 1:(displayOpenPanel? 2:0);
 	
 	// note that this function does not modify the user defaults - the user still has to accept or cancel the panel
@@ -101,7 +109,7 @@
 {
 	static PrefsWindowController *sharedPrefsWindowController = nil;
 	if( !sharedPrefsWindowController )
-		sharedPrefsWindowController = [[PrefsWindowController allocWithZone:[self zone]] init];
+		sharedPrefsWindowController = [[PrefsWindowController allocWithZone:nil] init];
 	return sharedPrefsWindowController;
 }
 

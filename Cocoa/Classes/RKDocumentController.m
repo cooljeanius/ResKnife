@@ -4,7 +4,7 @@
 
 @implementation RKDocumentController
 
-- (int)runModalOpenPanel:(NSOpenPanel *)openPanel forTypes:(NSArray *)extensions
+- (NSInteger)runModalOpenPanel:(NSOpenPanel *)openPanel forTypes:(NSArray *)extensions
 {
 	// set-up open panel (this happens every time, but no harm done)
 	ApplicationDelegate *appDelegate = [NSApp delegate];
@@ -17,7 +17,7 @@
 	[openPanelAccessoryView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
 	
 	// run panel
-	int button = [super runModalOpenPanel:openPanel forTypes:extensions];
+	NSInteger button = [super runModalOpenPanel:openPanel forTypes:extensions];
 	if(button == NSOKButton)
 		[openPanelDelegate setReadOpenPanelForFork:YES];
 	return button;

@@ -23,20 +23,7 @@
 
 #import "RKEditorRegistry.h"
 #import "RKSupportResourceRegistry.h"
-#import "NSString-FSSpec.h"		// for ResKnifeBoolExtensions (in wrong file)
-
-/*!
-@class			RKEditorRegistry
-@author			Uli Kusterer
-@created		2003-07-31
-@description	This is a registry where all our resource-editor plugins are looked
-				up and entered in a list, so you can ask for the editor for a specific
-				resource type and it is returned immediately. This registry reads the
-				types a plugin handles from their info.plist. This is better than
-				encoding the type in the plugin file name, as file names are not
-				guaranteed to be on a case-sensitive file system on Mac, and this also
-				allows an editor to register for several resource types.
-*/
+#import "NGSCategories.h"		// for ResKnifeBoolExtensions (in wrong file)
 
 @implementation RKEditorRegistry
 
@@ -84,9 +71,9 @@
 				class and its bundle when reloading the plugin list by simply
 				relying on NSMutableDictionary to release it.
 
-@description	This scans the application's internal Plugins folder,
-				<tt>~/Library/Application Support/ResKnife/Plugins/</tt> and
-				<tt>/Library/Application Support/ResKnife/Plugins/</tt> for
+@description	<p>This scans the application's internal Plugins folder,
+				<code>~/Library/Application Support/ResKnife/Plugins/</code> and
+				<code>/Library/Application Support/ResKnife/Plugins/</code> for
 				plugins that have the extension ".plugin" and implement
 				<tt>initWithResource:</tt> (which means this won't get into
 				the way if you want to support other kinds of plugins).</p>
@@ -98,7 +85,7 @@
 				If several plugins register for the same type, the last one
 				loaded wins.</p>
 				
-				<p>To instantiate an object from a plugin, see <tt>editorForType:</tt>
+				<p>To instantiate an object from a plugin, see <code>editorForType:</code>
 */
 - (IBAction)scanForPlugins:(id)sender
 {
@@ -107,24 +94,23 @@
 	NSString		*userPath = [NSHomeDirectory() stringByAppendingPathComponent:appSupport];
 	NSString		*sysPath = [@"/" stringByAppendingPathComponent:appSupport];
 //	NSArray			*paths = NSSearchPathForDirectoriesInDomains(NSAllLibrariesDirectory, NSAllDomainsMask, YES);
-	NSEnumerator	*pathEnumerator = [[NSArray arrayWithObjects:appPath, userPath, sysPath, nil] objectEnumerator];
+	NSEnumerator	*pathEnumerator = [@[appPath, userPath, sysPath] objectEnumerator];
 	NSString		*path;
 	
 	// release any existing registry to clear old values
-	if(typeRegistry) [typeRegistry release];
 	typeRegistry = [[NSMutableDictionary alloc] init];
 	
 	// scan all paths
 	while(path = [pathEnumerator nextObject])
 	{
-		NSEnumerator *fileEnumerator = [[[NSFileManager defaultManager] directoryContentsAtPath:path] objectEnumerator];
+		NSEnumerator *fileEnumerator = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:nil] objectEnumerator];
 		NSString *pluginName;
 		
 		// enumerate all files in this directory
 		while(pluginName = [fileEnumerator nextObject])
 		{
 			NSString *pluginPath = [path stringByAppendingPathComponent:pluginName];
-//			NSLog(@"Examining %@", pluginPath);
+			//NSLog(@"Examining %@", pluginPath);
 			
 			// verify file is a plugin
 			if([[pluginName pathExtension] isEqualToString:@"plugin"])
@@ -133,12 +119,12 @@
 				Class pluginClass = [plugin principalClass];
 				if(plugin && pluginClass)
 				{
-//					NSLog(@"Principal class %@ %@ to ResKnifePluginProtocol", NSStringFromClass(pluginClass), [pluginClass conformsToProtocol:@protocol(ResKnifePluginProtocol)]? @"conforms":@"does not conform");
+					//NSLog(@"Principal class %@ %@ to ResKnifePlugin", NSStringFromClass(pluginClass), [pluginClass conformsToProtocol:@protocol(ResKnifePlugin)]? @"conforms":@"does not conform");
 					
-					// check principal class implements ResKnifePluginProtocol
-					if([pluginClass conformsToProtocol:@protocol(ResKnifePluginProtocol)])
+					// check principal class implements ResKnifePlugin
+					if([pluginClass conformsToProtocol:@protocol(ResKnifePlugin)])
 					{
-						NSArray *supportedTypes = [[plugin infoDictionary] objectForKey:@"RKSupportedTypes"];
+						NSArray *supportedTypes = [plugin infoDictionary][@"RKSupportedTypes"];
 						if(supportedTypes)
 						{
 							NSDictionary *typeEntry;
@@ -148,13 +134,13 @@
 							while(typeEntry = [typesEnumerator nextObject])
 							{
 								// get values for type entry
-								NSString *name = [typeEntry objectForKey:@"RKTypeName"];
-//								NSString *role = [typeEntry objectForKey:@"RKTypeRole"];
-//								BOOL isDefault = [(NSString *)[typeEntry objectForKey:@"IsResKnifeDefaultForType"] boolValue];
+								NSString *name = typeEntry[@"RKTypeName"];
+								//NSString *role = [typeEntry objectForKey:@"RKTypeRole"];
+								//BOOL isDefault = [(NSString *)[typeEntry objectForKey:@"IsResKnifeDefaultForType"] boolValue];
 								
 								// register them
-								[typeRegistry setObject:pluginClass forKey:name];		// bug: very primative, doesn't use extra data
-//								NSLog(@"Plug-in class %@ registered as %@%@ for type %@.", NSStringFromClass(pluginClass), isDefault? @"default ":@"", role, name);
+								typeRegistry[name] = pluginClass;		// bug: very primative, doesn't use extra data
+								//NSLog(@"Plug-in class %@ registered as %@%@ for type %@.", NSStringFromClass(pluginClass), isDefault? @"default ":@"", role, name);
 							}
 						}
 						else
@@ -162,14 +148,14 @@
 							// try the old way of looking up types
 							NSString		*resType;
 							NSEnumerator	*enny;
-							supportedTypes = [[plugin infoDictionary] objectForKey:@"RKEditedTypes"];
+							supportedTypes = [plugin infoDictionary][@"RKEditedTypes"];
 							if(supportedTypes == nil)
-								supportedTypes = [NSArray arrayWithObject: [[plugin infoDictionary] objectForKey:@"RKEditedType"]];
+								supportedTypes = @[[plugin infoDictionary][@"RKEditedType"]];
 							
 							for(enny = [supportedTypes objectEnumerator]; resType = [enny nextObject];)
 							{
-								[typeRegistry setObject:pluginClass forKey:resType];
-//								NSLog(@"Registered for type %@.",resType);
+								typeRegistry[resType] = pluginClass;
+								//NSLog(@"Registered for type %@.",resType);
 							}
 						}
 						
@@ -200,7 +186,7 @@
 
 - (Class)editorForType:(NSString *)typeStr
 {
-	Class theClass = [typeRegistry objectForKey: typeStr];
+	Class theClass = typeRegistry[typeStr];
 	if(!theClass) return Nil;
 	else return theClass;
 }

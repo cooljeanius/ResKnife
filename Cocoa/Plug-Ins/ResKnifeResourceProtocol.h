@@ -1,6 +1,6 @@
 /* =============================================================================
 	PROJECT:	ResKnife
-	FILE:		ResKnifeResourceProtocol.h
+	FILE:		ResKnifeResource.h
 	
 	PURPOSE:	This protocol wraps up whatever implementation the host
 				application (i.e. ResKnife) uses for resources in a way that
@@ -23,22 +23,36 @@
 
 #import <Cocoa/Cocoa.h>
 
-@protocol ResKnifeResourceProtocol
+NS_ASSUME_NONNULL_BEGIN
+
+typedef NS_OPTIONS(unsigned short, RKResAttribute) {
+	//! System or application heap?
+	RKResAttributeSystemHeap = resSysHeap,
+	//! Purgeable resource?
+	RKResAttributePurgeable = resPurgeable,
+	//! Load it in locked?
+	RKResAttributeLocked = resLocked,
+	//! Protected?
+	RKResAttributeProtected = resProtected,
+	//! Load in on OpenResFile?
+	RKResAttributePreload = resPreload,
+	//! Resource changed?
+	RKResAttributeChanged = resChanged,
+};
+
+@protocol ResKnifeResource <NSObject, NSCopying>
+@property (nullable) NSString *name;
+@property OSType type;
+@property ResID resID;
+@property RKResAttribute attributes;
+@property (nullable) NSData *data;
+@property (readonly) NSUInteger size;
+@property (readonly, getter = isDirty) BOOL dirty;
 
 - (void)touch;
-- (BOOL)isDirty;
 
-- (NSString *)name;
-- (void)setName:(NSString *)newName;
-- (NSString *)type;
-- (void)setType:(NSString *)newType;
-- (NSNumber *)resID;
-- (void)setResID:(NSNumber *)newResID;
-- (NSNumber *)attributes;
-- (void)setAttributes:(NSNumber *)newAttributes;
-- (NSNumber *)size;
-- (NSData *)data;
-- (void)setData:(NSData *)newData;
+// Prevent a warning
+- (id)copy;
 
 - (NSString *)defaultWindowTitle;
 - (NSDocument *)document;   // Owner of this resource. Useful for looking for resources in same file as yours.
@@ -49,13 +63,22 @@
 //	All returned objects are auoreleased. Retain if you want to keep them.
 
 //	This method may return an empty array
-+ (NSArray *)allResourcesOfType:(NSString *)typeValue inDocument:(NSDocument *)searchDocument;
++ (NSArray<id<ResKnifeResource>> *)allResourcesOfType:(OSType)typeValue inDocument:(nullable NSDocument *)searchDocument;
 //	The next two return the first matching resource found, or nil.
-+ (id)resourceOfType:(NSString *)typeValue andID:(NSNumber *)resIDValue inDocument:(NSDocument *)searchDocument;
-+ (id)resourceOfType:(NSString *)typeValue withName:(NSString *)nameValue inDocument:(NSDocument *)searchDocument;
++ (nullable instancetype)resourceOfType:(OSType)typeValue andID:(ResID)resIDValue inDocument:(nullable NSDocument *)searchDocument;
++ (nullable instancetype)resourceOfType:(OSType)typeValue withName:(NSString *)nameValue inDocument:(nullable NSDocument *)searchDocument;
 
 @end
 
+static inline NSString *GetNSStringFromOSType(OSType theType)
+{
+	return CFBridgingRelease(UTCreateStringForOSType(theType));
+}
+
+static inline OSType GetOSTypeFromNSString(NSString *theString)
+{
+	return UTGetOSTypeFromString((__bridge CFStringRef)theString);
+}
 
 // See note in Notifications.m about usage of these
 extern NSString *ResourceWillChangeNotification;
@@ -73,3 +96,5 @@ extern NSString *ResourceAttributesDidChangeNotification;
 extern NSString *ResourceDataDidChangeNotification;
 extern NSString *ResourceDidChangeNotification;
 extern NSString *ResourceWasSavedNotification;
+
+NS_ASSUME_NONNULL_END

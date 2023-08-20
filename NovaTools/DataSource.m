@@ -2,54 +2,46 @@
 #import "ResKnifeResourceProtocol.h"
 #import "NSNumber-Range.h"
 
-@implementation DataSource
+@interface DataSource ()
+@property (strong) NSMutableDictionary *data1;
+@end
 
-- (id)init
+@implementation DataSource
+@synthesize data1 = data;
+
+- (instancetype)init
 {
-	[self autorelease];
 	return nil;
 }
 
-- (id)initForType:(NSString *)typeString
+- (instancetype)initForType:(OSType)typeString
 {
 	self = [super init];
-	type = [typeString copy];
-	data = [[NSMutableDictionary alloc] init];
-	{
-		id <ResKnifeResourceProtocol> resource;
+	if (self) {
+		type = typeString;
+		data = [[NSMutableDictionary alloc] init];
 		NSArray *resources = [NSClassFromString(@"Resource") allResourcesOfType:type inDocument:nil];	// nil document will search in ANY open document for the correct resource
-		NSEnumerator *enumerator = [resources objectEnumerator];
-		while( resource = [enumerator nextObject] )
-			[data setObject:[resource name] forKey:[resource resID]];
+		for (id <ResKnifeResource> resource in resources )
+			data[@([resource resID])] = [resource name];
+		parsed = [[data allValues] mutableCopy];
 	}
-	parsed = [[NSMutableArray alloc] initWithArray:[data allValues]];
 	return self;
-}
-
-- (void)dealloc
-{
-	[type release];
-	[data release];
-	[parsed release];
-	[super dealloc];
 }
 
 - (NSDictionary *)data
 {
-	return data;
+	return [NSDictionary dictionaryWithDictionary:data];
 }
 
 - (void)setData:(NSMutableDictionary *)newData
 {
-	id old = data;
-	data = [newData retain];
+	self.data1 = newData;
 	[self parseForString:@"" sorted:YES];
-	[old autorelease];
 }
 
-- (void)setString:(NSString *)string forResID:(int)resID
+- (void)setString:(NSString *)string forResID:(ResID)resID
 {
-	[data setObject:string forKey:[NSNumber numberWithInt:resID]];
+	data[@(resID)] = string;
 }
 
 - (void)parseForString:(NSString *)string sorted:(BOOL)sort
@@ -60,16 +52,14 @@
 
 - (void)parseForString:(NSString *)string withinRange:(NSRange)resIDRange sorted:(BOOL)sort
 {
-	NSNumber *resID;
 	NSString *trimmedString = [DataSource resNameFromStringValue:string];
-	NSEnumerator *enumerator = [[data allKeys] objectEnumerator];
 	[parsed removeAllObjects];
 	if( trimmedString == nil ) trimmedString = @"";
-	while( resID = [enumerator nextObject] )
-	{
-		NSString *value = [data objectForKey:resID];
+	for (NSNumber *NumID in data) {
+		short resID = [NumID shortValue];
+		NSString *value = data[NumID];
 		NSRange range = [value rangeOfString:trimmedString options:NSCaseInsensitiveSearch];
-		if( ((range.location != NSNotFound && range.length != 0) || [trimmedString isEqualToString:@""]) && [resID isBoundedByRange:resIDRange] )
+		if( ((range.location != NSNotFound && range.length != 0) || [trimmedString isEqualToString:@""]) && [NumID isBoundedByRange:resIDRange] )
 			[parsed addObject:[self stringValueForResID:resID]];
 	}
 	
@@ -80,36 +70,36 @@
 	if( sort ) [parsed sortUsingSelector:@selector(caseInsensitiveCompare:)];
 }
 
-- (id)objectValueForResID:(NSNumber *)resID
+- (id)objectValueForResID:(ResID)resID
 {
-	return [data objectForKey:resID];
+	return data[@(resID)];
 }
 
-- (NSString *)stringValueForResID:(NSNumber *)resID
+- (NSString *)stringValueForResID:(ResID)resID
 {
-	if( resID && [data objectForKey:resID] )
-		return [NSString stringWithFormat:@"%@ {%@}", [data objectForKey:resID], resID];
-	else if( [resID shortValue] == -1 )
+	if( resID && data[@(resID)] )
+		return [NSString stringWithFormat:@"%@ {%@}", data[@(resID)], @(resID)];
+	else if( resID == -1 )
 		return @"";
 	else if( resID )
-		return [NSString stringWithFormat:@"{%@}", resID];
+		return [NSString stringWithFormat:@"{%@}", @(resID)];
 	return nil;
 }
 
-+ (NSNumber *)resIDFromStringValue:(NSString *)string
++ (short)resIDFromStringValue:(NSString *)string
 {
 	NSRange span, range = NSMakeRange(0,0);
 	span = [string rangeOfString:@"{" options:NSBackwardsSearch];
 	if( span.location != NSNotFound )	range.location = span.location +1;
-	else return [NSNumber numberWithInt:-1];
+	else return -1;
 	span = [string rangeOfString:@"}" options:NSBackwardsSearch];
 	if( span.location != NSNotFound )	range.length = span.location - range.location;
-	else return [NSNumber numberWithInt:-1];
-	NS_DURING
-		NS_VALUERETURN( [[[NSNumber alloc] initWithInt:[[string substringWithRange:range] intValue]] autorelease], NSNumber* );
-	NS_HANDLER
-		NS_VALUERETURN( [NSNumber numberWithInt:-1], NSNumber* );
-	NS_ENDHANDLER
+	else return -1;
+	@try {
+		return [@([[string substringWithRange:range] intValue]) shortValue];
+	} @catch (NSException *localException) {
+		return 1;
+	}
 }
 
 + (NSString *)resNameFromStringValue:(NSString *)string
@@ -119,17 +109,18 @@
 		return [string substringToIndex:range.location -1];
 	else if( range.location == 0 )
 		return nil;
-	else return string;
+	else
+		return string;
 }
 
 /* NSComboBox Informal Prototype Implementation */
 
-- (id)comboBox:(NSComboBox *)comboBox objectValueForItemAtIndex:(int)index
+- (id)comboBox:(NSComboBox *)comboBox objectValueForItemAtIndex:(NSInteger)index
 {
-	return [parsed objectAtIndex:index];
+	return parsed[index];
 }
 
-- (int)numberOfItemsInComboBox:(NSComboBox *)comboBox
+- (NSInteger)numberOfItemsInComboBox:(NSComboBox *)comboBox
 {
 	return [parsed count];
 }
@@ -145,7 +136,7 @@
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"\nType: %@\nData: %@\nParsed Data: %@\n", type, [data description], [parsed description]];
+	return [NSString stringWithFormat:@"\nType: %@\nData: %@\nParsed Data: %@\n", GetNSStringFromOSType(type), [data description], [parsed description]];
 }
 
 @end

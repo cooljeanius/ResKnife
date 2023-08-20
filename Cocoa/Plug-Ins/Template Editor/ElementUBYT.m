@@ -3,11 +3,13 @@
 #define SIZE_ON_DISK (1)
 
 @implementation ElementUBYT
+@synthesize value;
+@dynamic stringValue;
 
 - (id)copyWithZone:(NSZone *)zone
 {
 	ElementUBYT *element = [super copyWithZone:zone];
-	[element setValue:value];
+	element.value = value;
 	return element;
 }
 
@@ -26,16 +28,6 @@
 	[stream writeAmount:SIZE_ON_DISK fromBuffer:&value];
 }
 
-- (void)setValue:(UInt8)v
-{
-	value = v;
-}
-
-- (UInt8)value
-{
-	return value;
-}
-
 - (NSString *)stringValue
 {
 	return [NSString stringWithFormat:@"%hhu", value];
@@ -45,8 +37,8 @@
 {
 	char cstr[256];
 	char *endPtr = cstr + 255;
-	strncpy(cstr, [str cString], 255);
-	value = strtoul(cstr, &endPtr, 10);
+	strncpy(cstr, [str cStringUsingEncoding:NSMacOSRomanStringEncoding], 255);
+	value = (UInt8)strtoul(cstr, &endPtr, 10);
 }
 
 @end

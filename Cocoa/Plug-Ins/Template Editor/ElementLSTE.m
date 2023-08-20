@@ -3,6 +3,10 @@
 #import "ElementOCNT.h"
 
 @implementation ElementLSTE
+@synthesize writesZeroByte;
+@synthesize groupElementTemplate;
+@synthesize countElement;
+@dynamic stringValue;
 
 - (id)copyWithZone:(NSZone *)zone
 {
@@ -13,34 +17,6 @@
 	return element;
 }
 
-- (void)dealloc
-{
-	[groupElementTemplate release];
-	[super dealloc];
-}
-
-- (void)setGroupElementTemplate:(ElementLSTB *)e
-{
-	id old = groupElementTemplate;
-	groupElementTemplate = [e retain];
-	[old release];
-}
-
-- (ElementLSTB *)groupElementTemplate
-{
-	return groupElementTemplate;
-}
-
-- (void)setCountElement:(ElementOCNT *)e
-{
-	// do not retain sibling element
-	countElement = e;
-}
-
-- (ElementOCNT *)countElement
-{
-	return countElement;
-}
 
 - (void)readSubElementsFrom:(TemplateStream *)stream
 {
@@ -75,9 +51,9 @@
 
 - (IBAction)createListEntry:(id)sender
 {
-	ElementLSTB *list = [[groupElementTemplate copy] autorelease];
-	[parentArray insertObject:list atIndex:[parentArray indexOfObject:self]];
-	[list setParentArray:parentArray];
+	ElementLSTB *list = [groupElementTemplate copy];
+	[self.parentArray insertObject:list atIndex:[self.parentArray indexOfObject:self]];
+	[list setParentArray:self.parentArray];
 	[list setCountElement:countElement];
 	[countElement increment];
 }

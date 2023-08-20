@@ -1,19 +1,12 @@
 #import "Element.h"
 
 @interface ElementOCNT : Element
-{
-	unsigned long value;
-}
+@property UInt32 value;
+@property (unsafe_unretained) NSString *stringValue;
 
 - (BOOL)countFromZero;
 
-- (void)setValue:(unsigned long)v;
-- (unsigned long)value;
-
 - (void)increment;
 - (void)decrement;
-
-- (NSString *)stringValue;
-- (void)setStringValue:(NSString *)str;
 
 @end
