@@ -8,7 +8,7 @@ Add viewers for MooV and PICT.
 Modify -[Resource data] and -[Resource setData] to use ResourceManager functions behind the scenes instead of an NSData object. This should fix the problem with new resources not being saved at times.
 
 
-// some old to-dos. don't know if these still apply
+// some old to-dos; dunno know if these still apply:
 
 -> "Open as Hex" displays "(null)" as the document name. Why?
 -> Changing the type/creator of a file isn't written to disk by ResourceDocument.
