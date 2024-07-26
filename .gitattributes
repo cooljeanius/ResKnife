@@ -1,2 +1,2 @@
 *.pbxproj -crlf -diff -merge
-
+*.r linguist-language=rez
